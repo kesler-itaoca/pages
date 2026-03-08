@@ -89,7 +89,7 @@
 
     <header class="appbar">
       <div style="display:flex;align-items:center;gap:12px">
-        <img id="logoImg" class="logo-img" src="logo.jpg" alt="logo" />
+        <img id="logoImg" class="logo-img" src="https://yata-apix-26d89c64-255e-44a8-a7e2-98a7a639f851.s3-object.locaweb.com.br/b057cb744b064181a08c9d4ce88202bf.jpg" alt="logo" />
       </div>
       <div style="margin-left:auto">
         <div class="header-title">Viabilidade Imobiliária</div>
@@ -340,8 +340,15 @@
       </aside>
     </div>
   </div>
+  
+    <!-- Bibliotecas externas -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
   <script>
+  /* ---------- Utilitários ---------- */
   function parseCurrency(raw){
     if(raw === undefined || raw === null) return 0;
     if(typeof raw === "number") return raw;
@@ -349,14 +356,14 @@
     if(raw === "") return 0;
     raw = raw.replace(/\s/g,"").replace(/^R\$/i,"");
     if(raw.indexOf(",") > -1 && raw.indexOf(".") > -1){
-      raw = raw.replace(/\./g,"").replace(",",".");
-    } else {
-      raw = raw.replace(",",".");
+      raw = raw.replace(/\./g,"").replace(",",";");
     }
+    raw = raw.replace(",",".").replace(";",".");
     const n = parseFloat(raw);
     return isNaN(n) ? 0 : n;
   }
   function fmtBRL(v){ return Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"}); }
+  function fmtNumberInput(v){ return Number(v||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}); }
 
   function formatTipoPagamentoDisplay(raw){
     if(!raw) return "";
@@ -366,133 +373,191 @@
     return v.charAt(0).toUpperCase() + v.slice(1);
   }
 
-  function toggleFinancingFields() {
-    const tipo = document.getElementById("tipoPagamento").value;
-    const bloqueio = ["entradaPerc","jurosAnual","prazoFinanciamento","sistema"];
-    if(tipo === "avista"){
-      bloqueio.forEach(id=>{
-        const el = document.getElementById(id);
-        if(!el) return;
-        el.value = "";
-        el.disabled = true;
-      });
+  /* ---------- IR ganho de capital PF (marginal por faixas) ---------- */
+  function impostoGanhoCapitalPF(base){
+    const faixas = [
+      {lim: 5000000, aliq: 0.15},
+      {lim: 10000000, aliq: 0.175},
+      {lim: 30000000, aliq: 0.20},
+      {lim: Infinity, aliq: 0.225}
+    ];
+    let restante = base;
+    let imposto = 0;
+    let inferior = 0;
+    for(const f of faixas){
+      const teto = f.lim;
+      const parcela = Math.max(0, Math.min(restante, teto - inferior));
+      imposto += parcela * f.aliq;
+      restante -= parcela;
+      inferior = teto;
+      if(restante <= 0) break;
+    }
+    return imposto;
+  }
+  function ultimaAliquotaPorFaixa(base){
+    if(base > 30000000) return 0.225;
+    if(base > 10000000) return 0.20;
+    if(base > 5000000) return 0.175;
+    return 0.15;
+  }
+
+  /* ---------- Financiamento (SAC / PRICE) até N meses ---------- */
+  function calcFinDetalhado(valorFin, taxaAnual, prazoTotal, mesesConsiderados, sistema){
+    const i = (taxaAnual/100)/12;
+    let jurosAcum = 0;
+    let principalPago = 0;
+    let parcela = 0;
+    let saldo = valorFin;
+    if(prazoTotal <= 0 || valorFin <= 0) return {jurosAcum:0, principalPago:0, parcela:0, saldoDevedor:valorFin};
+
+    if(sistema === "PRICE"){
+      if(i === 0){
+        parcela = valorFin / prazoTotal;
+      } else {
+        parcela = valorFin * (i * Math.pow(1+i,prazoTotal)) / (Math.pow(1+i,prazoTotal)-1);
+      }
+      let meses = Math.min(mesesConsiderados, prazoTotal);
+      for(let m=1; m<=meses; m++){
+        const jurosMes = saldo * i;
+        const amort = parcela - jurosMes;
+        const amortReal = Math.max(0, amort);
+        jurosAcum += jurosMes;
+        principalPago += amortReal;
+        saldo = Math.max(0, saldo - amortReal);
+      }
+      return {jurosAcum, principalPago, parcela, saldoDevedor: Math.max(0, saldo)};
     } else {
-      bloqueio.forEach(id=>{
-        const el = document.getElementById(id);
-        if(!el) return;
-        el.disabled = false;
-      });
-      if(!document.getElementById("entradaPerc").value) document.getElementById("entradaPerc").value = "5";
-      if(!document.getElementById("jurosAnual").value) document.getElementById("jurosAnual").value = "11";
-      if(!document.getElementById("prazoFinanciamento").value) document.getElementById("prazoFinanciamento").value = "360";
-      if(!document.getElementById("sistema").value) document.getElementById("sistema").value = "SAC";
+      const amort = valorFin / prazoTotal;
+      let primeiraParcela = 0;
+      let meses = Math.min(mesesConsiderados, prazoTotal);
+      for(let m=1; m<=meses; m++){
+        const jurosMes = saldo * i;
+        const parcelaMes = amort + jurosMes;
+        if(m === 1) primeiraParcela = parcelaMes;
+        jurosAcum += jurosMes;
+        principalPago += amort;
+        saldo = Math.max(0, saldo - amort);
+      }
+      return {jurosAcum, principalPago, parcela: primeiraParcela, saldoDevedor: Math.max(0, saldo)};
     }
   }
 
+  /* ---------- Bloqueio/Desbloqueio do bloco Financiamento ---------- */
+  function setFinancingBlock(disabled){
+    const ids = ["entradaPerc","jurosAnual","prazoFinanciamento","sistema"];
+    ids.forEach(id=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.disabled = !!disabled;
+      if(disabled){
+        el.value = "";
+      }
+    });
+  }
+
+  function handleTipoPagamentoChange(){
+    const tipo = (document.getElementById("tipoPagamento")?.value || "avista").toLowerCase();
+    if(tipo === "avista"){
+      setFinancingBlock(true);
+    } else {
+      setFinancingBlock(false);
+      const sistemaEl = document.getElementById("sistema");
+      if(sistemaEl && (!sistemaEl.value || sistemaEl.value === "")) sistemaEl.value = "SAC";
+    }
+    calcular();
+  }
+
+  /* ---------- Campos dependentes (itbi, leiloeiro, corretor) ---------- */
   function updateItbiValor(){
     const vc = parseCurrency(document.getElementById("valorCompra").value);
     const perc = (parseFloat(document.getElementById("itbiPerc").value) || 0) / 100;
     const valor = vc * perc;
     const el = document.getElementById("itbiValor");
-    if(!el) return;
-    el.value = (vc === 0 || perc === 0) ? "" : fmtBRL(valor);
+    if(el) el.value = (vc === 0 || perc === 0) ? "" : fmtBRL(valor);
     calcular();
   }
-
   function updateLeiloeiroValor(){
     const vc = parseCurrency(document.getElementById("valorCompra").value);
     const perc = (parseFloat(document.getElementById("leiloeiroPerc").value) || 0) / 100;
     const valor = vc * perc;
     const el = document.getElementById("leiloeiroValor");
-    if(!el) return;
-    el.value = (vc === 0 || perc === 0) ? "" : fmtBRL(valor);
+    if(el) el.value = (vc === 0 || perc === 0) ? "" : fmtBRL(valor);
     calcular();
   }
-
   function updateCorretorValor(){
     const vm = parseCurrency(document.getElementById("valorMercado").value);
     const perc = (parseFloat(document.getElementById("corretorPerc").value) || 0) / 100;
     const valor = vm * perc;
     const el = document.getElementById("corretorValor");
-    if(!el) return;
-    el.value = (vm === 0 || perc === 0) ? "" : fmtBRL(valor);
+    if(el) el.value = (vm === 0 || perc === 0) ? "" : fmtBRL(valor);
     calcular();
   }
 
-  function calcular(){
-    toggleFinancingFields();
+  /* ---------- Formatação automática para campos monetários ---------- */
+  const moneyFields = [
+    "valorCompra","valorMercado","registro","honorarios","dividaIptu","dividaCondominio",
+    "reforma","outros","condMensal","iptuMensal","entradaValor"
+  ];
+  function attachCurrencyFormatting(){
+    moneyFields.forEach(id=>{
+      const el = document.getElementById(id);
+      if(!el) return;
+      el.addEventListener("focus", function(){
+        const n = parseCurrency(this.value);
+        this.value = n ? n.toFixed(2).replace(".",",") : "";
+      });
+      el.addEventListener("blur", function(){
+        const n = parseCurrency(this.value);
+        if(n === 0 && String(this.value).trim() === "") { this.value = ""; return; }
+        this.value = fmtNumberInput(n);
+      });
+    });
+  }
 
-    const tipoPagamento = document.getElementById("tipoPagamento").value || "avista";
+  /* ---------- Cálculo principal ---------- */
+  function calcular(){
+    handleTipoPagamentoChange; // só garante referência, listeners chamam de fato
+
+    const tipoPagamento = (document.getElementById("tipoPagamento").value || "avista").toLowerCase();
     const valorCompra = parseCurrency(document.getElementById("valorCompra").value);
     const valorMercado = parseCurrency(document.getElementById("valorMercado").value);
     const prazoMeses = Math.max(0, parseInt(document.getElementById("prazoMeses").value) || 0);
 
-    const entradaPerc = (parseFloat(document.getElementById("entradaPerc").value) || 0) / 100;
-    const jurosAnual = (parseFloat(document.getElementById("jurosAnual").value) || 0) / 100;
+    const entradaPerc = (parseFloat(document.getElementById("entradaPerc").value) || 0);
+    const jurosAnual = (parseFloat(document.getElementById("jurosAnual").value) || 0);
     const prazoFin = Math.max(0, parseInt(document.getElementById("prazoFinanciamento").value) || 0);
     const sistema = document.getElementById("sistema").value || "SAC";
 
+    // Entrada
+    const entradaValor = valorCompra * (entradaPerc/100);
+    const entradaEl = document.getElementById("entradaValor");
+    if(entradaEl) entradaEl.value = entradaValor ? fmtBRL(entradaValor) : "";
+
+    // Financiamento
     let valorFinanciado = 0;
-    let parcelaPrice = 0;
-    let parcelaSac = 0;
+    let parcela = 0;
     let totalPagoFinanciamentoAteVenda = 0;
     let saldoDevedor = 0;
-    const i = jurosAnual / 12;
-
-    const entradaValor = valorCompra * entradaPerc;
-    const entradaEl = document.getElementById("entradaValor");
-    if (entradaEl) entradaEl.value = entradaValor ? fmtBRL(entradaValor) : "";
 
     if(tipoPagamento === "financiado" && valorCompra > 0 && prazoFin > 0){
       valorFinanciado = Math.max(0, valorCompra - entradaValor);
-
-      if(sistema === "PRICE"){
-        if(i === 0){
-          parcelaPrice = valorFinanciado / prazoFin;
-        } else {
-          parcelaPrice = valorFinanciado * (i * Math.pow(1 + i, prazoFin)) / (Math.pow(1 + i, prazoFin) - 1);
-        }
-        let saldo = valorFinanciado;
-        totalPagoFinanciamentoAteVenda = 0;
-        for (let m = 1; m <= Math.min(prazoMeses, prazoFin); m++) {
-          const jurosMes = saldo * i;
-          const amort = parcelaPrice - jurosMes;
-          const amortReal = Math.max(0, amort);
-          saldo = Math.max(0, saldo - amortReal);
-          totalPagoFinanciamentoAteVenda += parcelaPrice;
-        }
-        saldoDevedor = Math.max(0, saldo);
-        document.getElementById("parcelaDisplay").value = parcelaPrice ? fmtBRL(parcelaPrice) : "";
-      } else {
-        const amort = valorFinanciado / prazoFin;
-        let saldo = valorFinanciado;
-        totalPagoFinanciamentoAteVenda = 0;
-        let primeiraParcela = 0;
-        for (let m = 1; m <= Math.min(prazoMeses, prazoFin); m++) {
-          const jurosMes = saldo * i;
-          const parcelaMes = amort + jurosMes;
-          if (m === 1) primeiraParcela = parcelaMes;
-          totalPagoFinanciamentoAteVenda += parcelaMes;
-          saldo = Math.max(0, saldo - amort);
-        }
-        saldoDevedor = Math.max(0, saldo);
-        parcelaSac = primeiraParcela;
-        document.getElementById("parcelaDisplay").value = parcelaSac ? fmtBRL(parcelaSac) : "";
-      }
-    } else {
-      document.getElementById("parcelaDisplay").value = "";
+      const fin = calcFinDetalhado(valorFinanciado, jurosAnual, prazoFin, prazoMeses, sistema);
+      parcela = fin.parcela;
+      totalPagoFinanciamentoAteVenda = fin.jurosAcum + fin.principalPago;
+      saldoDevedor = fin.saldoDevedor;
     }
 
     const vfEl = document.getElementById("valorFinanciadoDisplay");
-    if (vfEl) vfEl.value = valorFinanciado ? fmtBRL(valorFinanciado) : "";
-
+    if(vfEl) vfEl.value = valorFinanciado ? fmtBRL(valorFinanciado) : "";
+    const parcelaEl = document.getElementById("parcelaDisplay");
+    if(parcelaEl) parcelaEl.value = parcela ? fmtBRL(parcela) : "";
     const totalFinEl = document.getElementById("totalPagoFinAteVenda");
-    if (totalFinEl) totalFinEl.value = totalPagoFinanciamentoAteVenda ? fmtBRL(totalPagoFinanciamentoAteVenda) : "";
-
+    if(totalFinEl) totalFinEl.value = totalPagoFinanciamentoAteVenda ? fmtBRL(totalPagoFinanciamentoAteVenda) : "";
     const totalComEntradaEl = document.getElementById("totalPagoComEntrada");
     const totalComEntrada = (tipoPagamento === "financiado") ? (entradaValor + totalPagoFinanciamentoAteVenda) : 0;
-    if (totalComEntradaEl) totalComEntradaEl.value = totalComEntrada ? fmtBRL(totalComEntrada) : "";
+    if(totalComEntradaEl) totalComEntradaEl.value = totalComEntrada ? fmtBRL(totalComEntrada) : "";
 
+    // Custos fixos
     const itbiPerc = (parseFloat(document.getElementById("itbiPerc").value) || 0) / 100;
     const itbi = valorCompra * itbiPerc;
     const leiloeiroPerc = (parseFloat(document.getElementById("leiloeiroPerc").value) || 0) / 100;
@@ -506,7 +571,6 @@
     const honorarios = parseCurrency(document.getElementById("honorarios").value);
     const dividaIptu = parseCurrency(document.getElementById("dividaIptu").value);
     const dividaCondominio = parseCurrency(document.getElementById("dividaCondominio").value);
-
     const reforma = parseCurrency(document.getElementById("reforma").value);
     const outros = parseCurrency(document.getElementById("outros").value);
     const condMensal = parseCurrency(document.getElementById("condMensal").value);
@@ -523,30 +587,26 @@
       else corretorEl.value = fmtBRL(corretorValor);
     }
 
-    const custoFiscalIR = valorCompra + itbi + registro + reforma + corretorValor;
+    // Base fiscal IR (igual descrição do layout)
+    const custoFiscalIR = valorCompra + itbi + registro + reforma + corretorValor + honorarios + leiloeiro;
     const baseIR = Math.max(0, valorMercado - custoFiscalIR);
+    const irValor = impostoGanhoCapitalPF(baseIR);
+    const aliquotaExibida = ultimaAliquotaPorFaixa(baseIR);
 
-    let aliquota = 0.15;
-    if(baseIR > 5000000 && baseIR <= 10000000) aliquota = 0.175;
-    if(baseIR > 10000000 && baseIR <= 30000000) aliquota = 0.20;
-    if(baseIR > 30000000) aliquota = 0.225;
-
-    const irValor = baseIR * aliquota;
-
+    // Desembolso
     const custosFixos = itbi + registro + leiloeiro + honorarios + dividaIptu + dividaCondominio + reforma + outros + condTotal + iptuTotal;
     let desembolso = 0;
     if(tipoPagamento === "avista"){
       desembolso = valorCompra + custosFixos;
     } else {
-      const entradaValorLocal = valorCompra * entradaPerc;
-      desembolso = entradaValorLocal + totalPagoFinanciamentoAteVenda + custosFixos;
+      desembolso = entradaValor + totalPagoFinanciamentoAteVenda + custosFixos;
     }
 
+    // Valor real de venda
     let valorRealVenda = valorMercado - corretorValor - irValor;
     if(tipoPagamento === "financiado") valorRealVenda -= saldoDevedor;
 
     const lucroLiquido = valorRealVenda - desembolso;
-
     const lucroTotal = desembolso > 0 ? (lucroLiquido / desembolso) : 0;
     const lucroMensal = prazoMeses > 0 ? Math.pow(1 + lucroTotal, 1 / prazoMeses) - 1 : 0;
 
@@ -557,9 +617,10 @@
     document.getElementById("lucroMensalPerc").textContent = (lucroMensal*100).toFixed(2) + " %";
 
     document.getElementById("baseIR").textContent = fmtBRL(baseIR);
-    document.getElementById("aliquotaIR").textContent = (aliquota*100).toFixed(2) + " %";
+    document.getElementById("aliquotaIR").textContent = (aliquotaExibida*100).toFixed(2) + " %";
     document.getElementById("irValor").textContent = fmtBRL(irValor);
 
+    // snapshot para exportações
     window._viabilidade = {
       dadosImovel: document.getElementById("dadosImovel").value || "",
       cidade: document.getElementById("cidade").value || "",
@@ -568,15 +629,17 @@
       origem: document.getElementById("origem").value || "",
       tipoPagamento, valorCompra, valorMercado, prazoMeses,
       entradaPerc, jurosAnual, prazoFin, sistema,
-      valorFinanciado, parcelaPrice, parcelaSac, totalPagoFinanciamentoAteVenda, saldoDevedor,
+      valorFinanciado, parcela, totalPagoFinanciamentoAteVenda, saldoDevedor,
       itbi, leiloeiro, registro, honorarios, dividaIptu, dividaCondominio,
       reforma, outros, condTotal, iptuTotal, corretorValor,
-      custoFiscalIR, baseIR, aliquota, irValor,
+      custoFiscalIR, baseIR, aliquotaExibida, irValor,
       desembolso, valorRealVenda, lucroLiquido, lucroTotal, lucroMensal
     };
   }
 
+  /* ---------- Exportar Excel ---------- */
   function exportarExcel(){
+    calcular(); // garante dados atualizados
     const v = window._viabilidade || {};
     const headerText = "Itaoca - Excelência em Gestão de Ativos Imobiliários";
 
@@ -642,34 +705,38 @@
     ws["!cols"] = [{wch:40},{wch:30}];
     const wb = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(wb, ws, "Viabilidade");
-    XLSX.writeFile(wb, "viabilidade_itaoca.xlsx");
+    XLSX.writeFile(wb, "viabilidade.xlsx");
   }
-
+  
+  
+    /* ---------- Exportar PDF (layout igual ao PDF de exemplo) ---------- */
   async function exportarPDF(){
+    calcular(); // garante dados atualizados
+
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF({unit:"pt",format:"a4"});
     const v = window._viabilidade || {};
 
-    // Title
-    doc.setFontSize(16);
+    // Título
+    doc.setFontSize(14);
     doc.setTextColor(20,20,20);
-    doc.text("Relatório de Viabilidade – ITAOCA", 40, 72);
+    doc.text("Relatório de Viabilidade - ITAOCA", 40, 72);
 
-    // Destaque Financeiro (topo da primeira página)
+    // Destaque Financeiro
     const destaqueY = 96;
     doc.setFillColor(242, 239, 230);
     doc.rect(40, destaqueY, 520, 70, "F");
-    doc.setFontSize(11);
+    doc.setFontSize(9);
     doc.setTextColor(20,20,20);
     doc.text("Destaque Financeiro", 48, destaqueY + 18);
-    doc.setFontSize(12);
+    doc.setFontSize(10);
     doc.setFont(undefined, "bold");
     doc.text("Lucro líquido (real): " + document.getElementById("lucroLiquido").textContent, 48, destaqueY + 38);
     doc.text("% lucro total: " + document.getElementById("lucroTotalPerc").textContent, 300, destaqueY + 38);
     doc.text("% lucro mensal: " + document.getElementById("lucroMensalPerc").textContent, 300, destaqueY + 56);
     doc.setFont(undefined, "normal");
 
-    // Identificação do imóvel (logo abaixo do destaque)
+    // Identificação do imóvel
     const idY = destaqueY + 90;
     doc.setFontSize(11);
     doc.text("Identificação do imóvel:", 40, idY);
@@ -680,7 +747,7 @@
     const inscricaoText = v.inscricaoMunicipal || document.getElementById("inscricaoMunicipal").value || "";
     doc.text("Cidade: " + cidadeText + "   Inscrição municipal: " + inscricaoText, 40, idY + 30, {maxWidth:520});
 
-    // Table with full details starting below identification
+    // Tabela (igual ao PDF anexo)
     const startY = idY + 54;
     const rows = [
       ["Referência interna", v.refInterna || document.getElementById("refInterna").value || ""],
@@ -727,12 +794,12 @@
       startY: startY,
       head: [["Campo","Valor"]],
       body: body,
-      styles:{fontSize:10},
+      styles:{fontSize:8},
       headStyles:{fillColor:[166,130,61]},
       margin: { left: 40, right: 40 }
     });
 
-    // Footer text on every page
+    // Footer em todas as páginas
     const footerText = "Itaoca - Excelência em Gestão de Ativos Imobiliários";
     const pageCount = doc.getNumberOfPages();
     const footerFontSize = 10;
@@ -751,89 +818,47 @@
     doc.save("viabilidade_itaoca.pdf");
   }
 
+  /* ---------- Exportar imagem ---------- */
   async function exportarImagem(){
-    const wrap = document.getElementById("pageWrap");
-    if(!wrap) return;
-
-    const logoImg = document.getElementById("logoImg");
-    let replacement = null;
-    try {
-      if(logoImg){
-        logoImg.style.visibility = "hidden";
-        replacement = document.createElement("div");
-        replacement.className = "logo-replacement";
-        replacement.textContent = "Itaoca - Excelência em Gestão de Ativos Imobiliários";
-        logoImg.parentNode.insertBefore(replacement, logoImg);
-      }
-
-      const scale = 2;
-      const opts = {
-        scale: scale,
-        useCORS: true,
-        allowTaint: false,
-        backgroundColor: null,
-        logging: false
-      };
-      const canvas = await html2canvas(wrap, opts);
-      const dataUrl = canvas.toDataURL("image/png");
-      const link = document.createElement("a");
-      link.href = dataUrl;
-      link.download = "viabilidade_itaoca.png";
-      document.body.appendChild(link);
-      link.click();
-      link.remove();
-    } catch (err) {
-      console.error("Erro ao gerar imagem:", err);
-      alert("Erro ao gerar imagem. Se o texto de substituição não aparecer, verifique o layout e tente novamente.");
-    } finally {
-      if(replacement && replacement.parentNode) replacement.parentNode.removeChild(replacement);
-      if(logoImg) logoImg.style.visibility = "";
-    }
+    calcular(); // garante dados atualizados
+    const el = document.getElementById("pageWrap");
+    const canvas = await html2canvas(el, {scale:2});
+    const dataURL = canvas.toDataURL("image/png");
+    const a = document.createElement("a");
+    a.href = dataURL;
+    a.download = "viabilidade_itaoca.png";
+    a.click();
   }
 
-  function attach(){
-    ["valorCompra","valorMercado","prazoMeses","entradaPerc","jurosAnual","prazoFinanciamento","itbiPerc","leiloeiroPerc","registro","honorarios","dividaIptu","dividaCondominio","reforma","outros","condMensal","iptuMensal","corretorPerc","dadosImovel","refInterna","origem","cidade","inscricaoMunicipal"].forEach(id=>{
-      const el = document.getElementById(id);
-      if(!el) return;
-      el.value = "";
-    });
+  /* ---------- Listeners ---------- */
+  document.addEventListener("DOMContentLoaded", function(){
+    attachCurrencyFormatting();
+    handleTipoPagamentoChange();
+    calcular();
 
-    document.getElementById("tipoPagamento").value = "avista";
-    document.getElementById("sistema").value = "SAC";
+    document.getElementById("tipoPagamento").addEventListener("change", handleTipoPagamentoChange);
+    document.getElementById("valorCompra").addEventListener("input", calcular);
+    document.getElementById("valorMercado").addEventListener("input", calcular);
+    document.getElementById("prazoMeses").addEventListener("input", calcular);
+    document.getElementById("entradaPerc").addEventListener("input", calcular);
+    document.getElementById("jurosAnual").addEventListener("input", calcular);
+    document.getElementById("prazoFinanciamento").addEventListener("input", calcular);
+    document.getElementById("sistema").addEventListener("change", calcular);
 
-    const ids = ["tipoPagamento","prazoMeses","valorCompra","valorMercado","entradaPerc","jurosAnual","prazoFinanciamento","sistema","itbiPerc","registro","leiloeiroPerc","honorarios","dividaIptu","dividaCondominio","reforma","outros","condMensal","iptuMensal","corretorPerc","dadosImovel","refInterna","origem","cidade","inscricaoMunicipal"];
-    ids.forEach(id=>{
-      const el = document.getElementById(id);
-      if(!el) return;
-      el.addEventListener("input", ()=>{
-        if(id === "corretorPerc" || id === "valorMercado") updateCorretorValor();
-        if(id === "itbiPerc" || id === "valorCompra") updateItbiValor();
-        if(id === "leiloeiroPerc" || id === "valorCompra") updateLeiloeiroValor();
-        else calcular();
+    document.getElementById("itbiPerc").addEventListener("input", updateItbiValor);
+    document.getElementById("leiloeiroPerc").addEventListener("input", updateLeiloeiroValor);
+    document.getElementById("corretorPerc").addEventListener("input", updateCorretorValor);
+
+    ["registro","honorarios","dividaIptu","dividaCondominio","reforma","outros","condMensal","iptuMensal"]
+      .forEach(id=>{
+        const el = document.getElementById(id);
+        if(el) el.addEventListener("input", calcular);
       });
-      el.addEventListener("change", calcular);
-      if(["valorCompra","valorMercado","registro","honorarios","dividaIptu","dividaCondominio","reforma","outros","condMensal","iptuMensal"].includes(id)){
-        el.addEventListener("blur", ()=>{
-          const v = parseCurrency(el.value);
-          if(v !== 0 || el.value.trim() !== "") el.value = v.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
-          calcular();
-        });
-      }
-    });
 
     document.getElementById("btnExportExcel").addEventListener("click", exportarExcel);
     document.getElementById("btnExportPDF").addEventListener("click", exportarPDF);
     document.getElementById("btnExportImage").addEventListener("click", exportarImagem);
-
-    calcular();
-  }
-
-  window.addEventListener("DOMContentLoaded", attach);
+  });
   </script>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </body>
 </html>
