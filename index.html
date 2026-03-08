@@ -516,8 +516,6 @@
 
   /* ---------- Cálculo principal ---------- */
   function calcular(){
-    handleTipoPagamentoChange; // só garante referência, listeners chamam de fato
-
     const tipoPagamento = (document.getElementById("tipoPagamento").value || "avista").toLowerCase();
     const valorCompra = parseCurrency(document.getElementById("valorCompra").value);
     const valorMercado = parseCurrency(document.getElementById("valorMercado").value);
@@ -528,44 +526,44 @@
     const prazoFin = Math.max(0, parseInt(document.getElementById("prazoFinanciamento").value) || 0);
     const sistema = document.getElementById("sistema").value || "SAC";
 
-    // Entrada
+    /* ---------- Entrada ---------- */
     const entradaValor = valorCompra * (entradaPerc/100);
-    const entradaEl = document.getElementById("entradaValor");
-    if(entradaEl) entradaEl.value = entradaValor ? fmtBRL(entradaValor) : "";
+    document.getElementById("entradaValor").value = entradaValor ? fmtBRL(entradaValor) : "";
 
-    // Financiamento
+    /* ---------- Financiamento ---------- */
     let valorFinanciado = 0;
     let parcela = 0;
     let totalPagoFinanciamentoAteVenda = 0;
     let saldoDevedor = 0;
 
     if(tipoPagamento === "financiado" && valorCompra > 0 && prazoFin > 0){
-      valorFinanciado = Math.max(0, valorCompra - entradaValor);
-      const fin = calcFinDetalhado(valorFinanciado, jurosAnual, prazoFin, prazoMeses, sistema);
-      parcela = fin.parcela;
-      totalPagoFinanciamentoAteVenda = fin.jurosAcum + fin.principalPago;
-      saldoDevedor = fin.saldoDevedor;
+        valorFinanciado = Math.max(0, valorCompra - entradaValor);
+
+        const fin = calcFinDetalhado(valorFinanciado, jurosAnual, prazoFin, prazoMeses, sistema);
+
+        parcela = fin.parcela;
+        totalPagoFinanciamentoAteVenda = fin.jurosAcum + fin.principalPago;
+        saldoDevedor = fin.saldoDevedor;
     }
 
-    const vfEl = document.getElementById("valorFinanciadoDisplay");
-    if(vfEl) vfEl.value = valorFinanciado ? fmtBRL(valorFinanciado) : "";
-    const parcelaEl = document.getElementById("parcelaDisplay");
-    if(parcelaEl) parcelaEl.value = parcela ? fmtBRL(parcela) : "";
-    const totalFinEl = document.getElementById("totalPagoFinAteVenda");
-    if(totalFinEl) totalFinEl.value = totalPagoFinanciamentoAteVenda ? fmtBRL(totalPagoFinanciamentoAteVenda) : "";
-    const totalComEntradaEl = document.getElementById("totalPagoComEntrada");
-    const totalComEntrada = (tipoPagamento === "financiado") ? (entradaValor + totalPagoFinanciamentoAteVenda) : 0;
-    if(totalComEntradaEl) totalComEntradaEl.value = totalComEntrada ? fmtBRL(totalComEntrada) : "";
+    document.getElementById("valorFinanciadoDisplay").value = valorFinanciado ? fmtBRL(valorFinanciado) : "";
+    document.getElementById("parcelaDisplay").value = parcela ? fmtBRL(parcela) : "";
+    document.getElementById("totalPagoFinAteVenda").value = totalPagoFinanciamentoAteVenda ? fmtBRL(totalPagoFinanciamentoAteVenda) : "";
 
-    // Custos fixos
+    const totalComEntrada = (tipoPagamento === "financiado")
+        ? entradaValor + totalPagoFinanciamentoAteVenda
+        : 0;
+
+    document.getElementById("totalPagoComEntrada").value = totalComEntrada ? fmtBRL(totalComEntrada) : "";
+
+    /* ---------- Custos fixos ---------- */
     const itbiPerc = (parseFloat(document.getElementById("itbiPerc").value) || 0) / 100;
     const itbi = valorCompra * itbiPerc;
+    document.getElementById("itbiValor").value = itbi ? fmtBRL(itbi) : "";
+
     const leiloeiroPerc = (parseFloat(document.getElementById("leiloeiroPerc").value) || 0) / 100;
     const leiloeiro = valorCompra * leiloeiroPerc;
-    const itbiEl = document.getElementById("itbiValor");
-    if(itbiEl) itbiEl.value = (valorCompra === 0 || itbiPerc === 0) ? "" : fmtBRL(itbi);
-    const leiloeiroEl = document.getElementById("leiloeiroValor");
-    if(leiloeiroEl) leiloeiroEl.value = (valorCompra === 0 || leiloeiroPerc === 0) ? "" : fmtBRL(leiloeiro);
+    document.getElementById("leiloeiroValor").value = leiloeiro ? fmtBRL(leiloeiro) : "";
 
     const registro = parseCurrency(document.getElementById("registro").value);
     const honorarios = parseCurrency(document.getElementById("honorarios").value);
@@ -579,30 +577,52 @@
     const condTotal = condMensal * prazoMeses;
     const iptuTotal = iptuMensal * prazoMeses;
 
+    /* ---------- Corretor ---------- */
     const corretorPerc = (parseFloat(document.getElementById("corretorPerc").value) || 0) / 100;
     const corretorValor = valorMercado * corretorPerc;
-    const corretorEl = document.getElementById("corretorValor");
-    if(corretorEl){
-      if(valorMercado === 0 || corretorPerc === 0) corretorEl.value = "";
-      else corretorEl.value = fmtBRL(corretorValor);
+    document.getElementById("corretorValor").value = corretorValor ? fmtBRL(corretorValor) : "";
+
+    /* ---------- JUROS pagos até a venda (ESSENCIAL PARA O IR) ---------- */
+    let principalPago = 0;
+    let jurosPagosAteVenda = 0;
+
+    if(tipoPagamento === "financiado" && valorFinanciado > 0){
+        principalPago = Math.max(0, valorFinanciado - saldoDevedor);
+        jurosPagosAteVenda = Math.max(0, totalPagoFinanciamentoAteVenda - principalPago);
     }
 
-    // Base fiscal IR (igual descrição do layout)
-    const custoFiscalIR = valorCompra + itbi + registro + reforma + corretorValor + honorarios + leiloeiro;
+    /* ---------- Custo fiscal IR (AGORA CORRETO) ---------- */
+    const custoFiscalIR =
+        valorCompra +
+        itbi +
+        registro +
+        reforma +
+        corretorValor +
+        honorarios +
+        leiloeiro +
+        jurosPagosAteVenda;  // << AQUI ESTÁ A CORREÇÃO
+
+    /* ---------- Base IR ---------- */
     const baseIR = Math.max(0, valorMercado - custoFiscalIR);
+
+    /* ---------- IR progressivo ---------- */
     const irValor = impostoGanhoCapitalPF(baseIR);
     const aliquotaExibida = ultimaAliquotaPorFaixa(baseIR);
 
-    // Desembolso
-    const custosFixos = itbi + registro + leiloeiro + honorarios + dividaIptu + dividaCondominio + reforma + outros + condTotal + iptuTotal;
+    /* ---------- Desembolso ---------- */
+    const custosFixos =
+        itbi + registro + leiloeiro + honorarios +
+        dividaIptu + dividaCondominio + reforma + outros +
+        condTotal + iptuTotal;
+
     let desembolso = 0;
     if(tipoPagamento === "avista"){
-      desembolso = valorCompra + custosFixos;
+        desembolso = valorCompra + custosFixos;
     } else {
-      desembolso = entradaValor + totalPagoFinanciamentoAteVenda + custosFixos;
+        desembolso = entradaValor + totalPagoFinanciamentoAteVenda + custosFixos;
     }
 
-    // Valor real de venda
+    /* ---------- Valor real de venda ---------- */
     let valorRealVenda = valorMercado - corretorValor - irValor;
     if(tipoPagamento === "financiado") valorRealVenda -= saldoDevedor;
 
@@ -610,6 +630,7 @@
     const lucroTotal = desembolso > 0 ? (lucroLiquido / desembolso) : 0;
     const lucroMensal = prazoMeses > 0 ? Math.pow(1 + lucroTotal, 1 / prazoMeses) - 1 : 0;
 
+    /* ---------- Atualiza UI ---------- */
     document.getElementById("totalCustos").textContent = fmtBRL(desembolso);
     document.getElementById("valorRealVenda").textContent = fmtBRL(valorRealVenda);
     document.getElementById("lucroLiquido").textContent = fmtBRL(lucroLiquido);
@@ -620,23 +641,25 @@
     document.getElementById("aliquotaIR").textContent = (aliquotaExibida*100).toFixed(2) + " %";
     document.getElementById("irValor").textContent = fmtBRL(irValor);
 
-    // snapshot para exportações
+    /* ---------- Snapshot para exportações ---------- */
     window._viabilidade = {
-      dadosImovel: document.getElementById("dadosImovel").value || "",
-      cidade: document.getElementById("cidade").value || "",
-      inscricaoMunicipal: document.getElementById("inscricaoMunicipal").value || "",
-      refInterna: document.getElementById("refInterna").value || "",
-      origem: document.getElementById("origem").value || "",
-      tipoPagamento, valorCompra, valorMercado, prazoMeses,
-      entradaPerc, jurosAnual, prazoFin, sistema,
-      valorFinanciado, parcela, totalPagoFinanciamentoAteVenda, saldoDevedor,
-      itbi, leiloeiro, registro, honorarios, dividaIptu, dividaCondominio,
-      reforma, outros, condTotal, iptuTotal, corretorValor,
-      custoFiscalIR, baseIR, aliquotaExibida, irValor,
-      desembolso, valorRealVenda, lucroLiquido, lucroTotal, lucroMensal
+        dadosImovel: document.getElementById("dadosImovel").value || "",
+        cidade: document.getElementById("cidade").value || "",
+        inscricaoMunicipal: document.getElementById("inscricaoMunicipal").value || "",
+        refInterna: document.getElementById("refInterna").value || "",
+        origem: document.getElementById("origem").value || "",
+        tipoPagamento, valorCompra, valorMercado, prazoMeses,
+        entradaPerc, jurosAnual, prazoFin, sistema,
+        valorFinanciado, parcela, totalPagoFinanciamentoAteVenda, saldoDevedor,
+        itbi, leiloeiro, registro, honorarios, dividaIptu, dividaCondominio,
+        reforma, outros, condTotal, iptuTotal, corretorValor,
+        custoFiscalIR, baseIR, aliquotaExibida, irValor,
+        desembolso, valorRealVenda, lucroLiquido, lucroTotal, lucroMensal,
+        jurosPagosAteVenda
     };
-  }
-
+}
+  
+  
   /* ---------- Exportar Excel ---------- */
   function exportarExcel(){
     calcular(); // garante dados atualizados
