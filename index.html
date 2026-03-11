@@ -925,7 +925,7 @@
       entradaPerc,
       jurosAnual: (parseFloat(document.getElementById("jurosAnual").value) || 0),
       prazoFin: Math.max(0, parseInt(document.getElementById("prazoFinanciamento").value) || 0),
-      sistema: document.getElementById("sistema").value || "SAC",
+      sistema: (tipoPagamento === "avista") ? "" : (document.getElementById("sistema").value || "SAC"),
       valorFinanciado: cFinal.valorFinanciado,
       parcela: cFinal.parcela,
       totalPagoFinanciamentoAteVenda: cFinal.totalPagoFinanciamentoAteVenda,
@@ -1059,46 +1059,65 @@
     doc.text(`% lucro total: ${(v.lucroTotal * 100).toFixed(2)} %`, 40, 90);
     doc.text(`% lucro mensal: ${(v.lucroMensal * 100).toFixed(2)} %`, 40, 110);
 
-    doc.autoTable({
-      startY: 140,
-      head: [["Campo", "Valor"]],
-      body: [
-        ["Identificação do imóvel", v.dadosImovel],
-        ["Cidade", v.cidade],
-        ["Inscrição municipal", v.inscricaoMunicipal],
-        ["Referência interna", v.refInterna],
-        ["Origem / Proprietário", v.origem],
-        ["Tipo pagamento", formatTipoPagamentoDisplay(v.tipoPagamento)],
-        ["Valor compra", fmtBRL(v.valorCompra)],
-        ["Valor mercado (venda)", fmtBRL(v.valorMercado)],
-        ["Prazo venda (meses)", v.prazoMeses],
-        ["ITBI (R$)", fmtBRL(v.itbi)],
-        ["Leiloeiro (R$)", fmtBRL(v.leiloeiro)],
-        ["Registro (R$)", fmtBRL(v.registro)],
-        ["Honorários adv. (R$)", fmtBRL(v.honorarios)],
-        ["Dívida IPTU (R$)", fmtBRL(v.dividaIptu)],
-        ["Dívida condomínio (R$)", fmtBRL(v.dividaCondominio)],
-        ["Reforma (R$)", fmtBRL(v.reforma)],
-        ["Outros custos (R$)", fmtBRL(v.outros)],
-        ["Comissão corretor (R$)", fmtBRL(v.corretorValor)],
-        ["Base IR", fmtBRL(v.baseIR)],
-        ["Alíquota IR", (v.aliquotaExibida * 100).toFixed(2) + " %"],
-        ["IR ganho de capital", fmtBRL(v.irValor)],
-        ["Total desembolso (o que saiu do bolso)", fmtBRL(v.desembolso)],
-        ["Valor real de venda (após IR e corretagem)", fmtBRL(v.valorRealVenda)],
-        ["Lucro líquido (real)", fmtBRL(v.lucroLiquido)],
-        ["% lucro total (sobre desembolso)", (v.lucroTotal * 100).toFixed(2) + " %"],
-        ["% lucro mensal", (v.lucroMensal * 100).toFixed(2) + " %"]
-      ],
-      styles: { fontSize: 9 },
-      headStyles: { fillColor: [27, 58, 60] }
-    });
+	doc.autoTable({
+  startY: 140,
+  head: [["Campo", "Valor"]],
+  body: [
+    // Identificação
+    ["Identificação do imóvel", v.dadosImovel],
+    ["Cidade", v.cidade],
+    ["Inscrição municipal", v.inscricaoMunicipal],
+    ["Referência interna", v.refInterna],
+    ["Origem / Proprietário", v.origem],
 
-    // Força nova página
-doc.addPage();
+    // Parâmetros
+    ["Tipo pagamento", formatTipoPagamentoDisplay(v.tipoPagamento)],
+    ["Valor compra", fmtBRL(v.valorCompra)],
+    ["Valor mercado (venda)", fmtBRL(v.valorMercado)],
+    ["Prazo venda (meses)", v.prazoMeses],
+
+    // Financiamento
+    ["Entrada (%)", v.entradaPerc + " %"],
+    ["Entrada (R$)", fmtBRL(v.valorCompra * (v.entradaPerc / 100))],
+    ["Taxa juros anual (%)", v.jurosAnual + " %"],
+    ["Prazo financiamento (meses)", v.prazoFin],
+    ["Sistema", v.sistema],
+    ["Valor financiado (R$)", fmtBRL(v.valorFinanciado)],
+    ["Parcela (R$)", fmtBRL(v.parcela)],
+    ["Total pago financiamento até venda (R$)", fmtBRL(v.totalPagoFinanciamentoAteVenda)],
+    ["Total pago (Entrada + Financiamento)", fmtBRL((v.valorCompra * (v.entradaPerc / 100)) + v.totalPagoFinanciamentoAteVenda)],
+
+    // Custos
+    ["ITBI (R$)", fmtBRL(v.itbi)],
+    ["Leiloeiro (R$)", fmtBRL(v.leiloeiro)],
+    ["Registro (R$)", fmtBRL(v.registro)],
+    ["Honorários adv. (R$)", fmtBRL(v.honorarios)],
+    ["Dívida IPTU (R$)", fmtBRL(v.dividaIptu)],
+    ["Dívida condomínio (R$)", fmtBRL(v.dividaCondominio)],
+    ["Reforma (R$)", fmtBRL(v.reforma)],
+    ["Outros custos (R$)", fmtBRL(v.outros)],
+    ["Condomínio total", fmtBRL(v.condTotal)],
+    ["IPTU total", fmtBRL(v.iptuTotal)],
+    ["Comissão corretor (R$)", fmtBRL(v.corretorValor)],
+
+    // Fiscais
+    ["Base IR", fmtBRL(v.baseIR)],
+    ["Alíquota IR", (v.aliquotaExibida * 100).toFixed(2) + " %"],
+    ["IR ganho de capital", fmtBRL(v.irValor)],
+
+    // Resultado final
+    ["Total desembolso", fmtBRL(v.desembolso)],
+    ["Valor real de venda", fmtBRL(v.valorRealVenda)],
+    ["Lucro líquido", fmtBRL(v.lucroLiquido)],
+    ["% lucro total", (v.lucroTotal * 100).toFixed(2) + " %"],
+    ["% lucro mensal", (v.lucroMensal * 100).toFixed(2) + " %"]
+  ],
+  styles: { fontSize: 9 },
+  headStyles: { fillColor: [27, 58, 60] }
+});
 
 doc.autoTable({
-  startY: 40,
+  startY: doc.lastAutoTable.finalY + 20,
   head: [["Mês", "Lucro líquido", "%"]],
   body: v.meses.map(m => [
     "Mês " + m.mes,
@@ -1108,6 +1127,7 @@ doc.autoTable({
   styles: { fontSize: 9 },
   headStyles: { fillColor: [27, 58, 60] }
 });
+
 
     doc.save("viabilidade_itaoca.pdf");
   }
@@ -1164,6 +1184,8 @@ doc.autoTable({
       updateCorretorValor();
       calcular();
     });
+	
+	document.getElementById("sistema").addEventListener("change", calcular);
 
     document.getElementById("itbiPerc").addEventListener("input", updateItbiValor);
     document.getElementById("leiloeiroPerc").addEventListener("input", updateLeiloeiroValor);
