@@ -293,15 +293,3 @@ select:focus {
   font-weight: 700;
   color: var(--dourado-itaoca);
 }
-/* =========================================
-   AJUSTES PARA IMPRESSÃO
-========================================= */
-@media print {
-  .logo-itaoca {
-    height: 30px !important;
-  }
-
-  .header-itaoca {
-    padding: 10px 20px !important;
-  }
-}
