@@ -293,3 +293,140 @@ select:focus {
   font-weight: 700;
   color: var(--dourado-itaoca);
 }
+
+/* Ajustes globais seguros */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+input,
+select {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.field,
+.field-inline,
+.stat,
+.header-itaoca,
+.wrap,
+.card,
+.grid,
+.form-grid,
+.meses-grid,
+.meses-col {
+  min-width: 0;
+}
+
+/* Melhor comportamento do header */
+.header-itaoca {
+  justify-content: flex-start;
+  gap: 16px;
+}
+
+.header-text {
+  position: static;
+  left: auto;
+  transform: none;
+  text-align: left;
+  flex: 1;
+}
+
+/* Campos lado a lado */
+.field-inline {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.field-inline input {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+/* Ajustes mobile */
+@media (max-width: 768px) {
+  .wrap {
+    margin: 16px auto;
+    padding: 0 12px;
+  }
+
+  .header-itaoca {
+    padding: 16px 14px;
+    align-items: flex-start;
+  }
+
+  .logo-itaoca {
+    height: 44px;
+  }
+
+  .header-text h1 {
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+
+  .header-text p {
+    font-size: 0.78rem;
+  }
+
+  .card {
+    padding: 16px;
+    border-radius: 12px;
+  }
+
+  .section-title {
+    font-size: 0.98rem;
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .field-inline {
+    flex-direction: column;
+  }
+
+  .stat {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
+  .value.money {
+    font-size: 1.1rem;
+  }
+
+  .mes-card {
+    padding: 16px 16px 16px 18px;
+  }
+
+  .mes-value {
+    font-size: 1.15rem;
+    word-break: break-word;
+  }
+
+  .mes-perc {
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 420px) {
+  input[type="text"],
+  input[type="number"],
+  select {
+    font-size: 16px;
+  }
+}
