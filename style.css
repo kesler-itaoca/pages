@@ -973,3 +973,168 @@ input:disabled {
 .btn-primary:hover {
   filter: brightness(1.05);
 }
+
+
+/* Ajustes finos de acabamento */
+
+.form-block {
+  background: #fafaf8;
+  border: 1px solid rgba(27,58,60,0.06);
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+}
+
+.form-block .section-title {
+  margin-top: 0;
+  margin-bottom: 12px;
+  padding-bottom: 5px;
+  font-size: clamp(0.96rem, 0.88rem + 0.22vw, 1.04rem);
+}
+
+label {
+  margin-bottom: 4px;
+  color: #667085;
+  letter-spacing: 0.1px;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+  border-color: rgba(27,58,60,0.12);
+  box-shadow: none;
+}
+
+input[type="text"]:hover,
+input[type="number"]:hover,
+select:hover {
+  border-color: rgba(166,130,61,0.45);
+}
+
+.card-form {
+  gap: 18px;
+}
+
+.support-panel {
+  border-radius: 14px;
+  padding: 18px 20px;
+  background: linear-gradient(180deg, rgba(27,58,60,0.045), rgba(166,130,61,0.06));
+  border: 1px dashed rgba(166,130,61,0.42);
+}
+
+.support-title {
+  margin-bottom: 8px;
+  font-size: 0.98rem;
+}
+
+.support-list {
+  font-size: 0.89rem;
+  line-height: 1.65;
+}
+
+.actions-row {
+  gap: 14px;
+  align-items: center;
+}
+
+.actions-row .btn-secondary,
+.actions-row .btn-primary {
+  min-width: 180px;
+  justify-content: center;
+}
+
+.btn-secondary {
+  background: #ffffff;
+}
+
+.btn-secondary:hover {
+  background: rgba(166,130,61,0.05);
+  border-color: rgba(166,130,61,0.5);
+}
+
+.btn-primary {
+  box-shadow: 0 8px 18px rgba(166,130,61,0.18);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 20px rgba(166,130,61,0.22);
+}
+
+.hero-resultado {
+  margin-bottom: 14px;
+}
+
+.stat {
+  padding: 10px 0;
+  gap: 10px;
+}
+
+.label {
+  color: #6B7280;
+}
+
+.value {
+  color: #111827;
+}
+
+.value.money {
+  color: #A6823D;
+}
+
+.small-muted {
+  margin-top: 8px;
+  line-height: 1.45;
+}
+
+.divider {
+  margin: 14px 0;
+  border-top: 1px solid rgba(27,58,60,0.08);
+}
+
+.meses-grid {
+  gap: 14px;
+}
+
+.mes-card {
+  padding: 13px 16px;
+  border-radius: 13px;
+}
+
+.mes-title {
+  margin-bottom: 5px;
+}
+
+.mes-value {
+  line-height: 1.2;
+}
+
+@media (max-width: 760px) {
+  .form-block {
+    padding: 15px;
+  }
+
+  .support-panel {
+    padding: 15px 16px;
+  }
+
+  .actions-row {
+    gap: 10px;
+  }
+
+  .actions-row .btn-secondary,
+  .actions-row .btn-primary {
+    min-width: 0;
+    width: 100%;
+  }
+
+  .mes-card {
+    padding: 12px 14px;
+  }
+
+  .mes-value {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+}
