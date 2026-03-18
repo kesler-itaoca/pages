@@ -907,3 +907,69 @@ input:disabled {
     display: none !important;
   }
 }
+
+.card-form {
+  display: grid;
+  grid-template-rows: auto auto auto 1fr auto;
+  gap: 16px;
+}
+
+.form-block {
+  background: #fbfbfb;
+  border: 1px solid rgba(0,0,0,0.05);
+  border-radius: 12px;
+  padding: 16px;
+}
+
+.form-block .section-title {
+  margin-top: 0;
+  margin-bottom: 14px;
+}
+
+.support-panel {
+  background: linear-gradient(180deg, rgba(27,58,60,0.04), rgba(166,130,61,0.05));
+  border: 1px dashed rgba(166,130,61,0.35);
+  border-radius: 12px;
+  padding: 16px 18px;
+  align-self: stretch;
+}
+
+.support-title {
+  margin: 0 0 10px 0;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #1B3A3C;
+}
+
+.support-list {
+  margin: 0;
+  padding-left: 18px;
+  color: #4b5563;
+  line-height: 1.6;
+  font-size: 0.9rem;
+}
+
+.actions-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.btn-primary {
+  border: 1px solid rgba(166,130,61,0.35);
+  background: #A6823D;
+  color: #FFFFFF;
+  padding: 12px 18px;
+  border-radius: 10px;
+  font-family: "Montserrat", sans-serif;
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-primary:hover {
+  filter: brightness(1.05);
+}
