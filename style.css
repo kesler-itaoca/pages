@@ -430,3 +430,40 @@ select {
     font-size: 16px;
   }
 }
+
+.header-itaoca {
+  background: var(--verde-itaoca);
+  padding: 22px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  box-shadow: var(--shadow);
+}
+
+.logo-itaoca {
+  height: 60px;
+  width: auto;
+  border-radius: 6px;
+  object-fit: contain;
+  position: absolute;
+  left: 32px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.header-text {
+  position: static;
+  transform: none;
+  text-align: center;
+  width: 100%;
+}
+
+.header-text h1 {
+  margin: 0;
+  padding: 0;
+  color: var(--branco);
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
