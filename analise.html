@@ -165,7 +165,7 @@
       <article class="card">
         <h2 class="section-title">Visão fiscal</h2>
 
-        <div class="stat"><span class="label">Valor de alienação fiscal</span><span class="value" id="fiscalAlienacao">R$ 0,00</span></div>
+        <div class="stat"><span class="label">Alienação líquida para IR</span><span class="value" id="fiscalAlienacao">R$ 0,00</span></div>
         <div class="stat"><span class="label">Custo fiscal</span><span class="value" id="fiscalCusto">R$ 0,00</span></div>
         <div class="stat"><span class="label">Ganho tributável</span><span class="value money" id="fiscalGanho">R$ 0,00</span></div>
         <div class="stat"><span class="label">Faixa marginal</span><span class="value" id="fiscalFaixa">-</span></div>
@@ -680,18 +680,23 @@
       const venda = valorVendaAtual !== null ? valorVendaAtual : dados.valorVenda;
       const corretorAtual = obterCorretagemAtual(dados, venda);
 
-      const valorAlienacaoFiscal = Math.max(
-        0,
-        venda - (POLITICA_FISCAL.incluirCorretagemNaAlienacao ? corretorAtual : 0)
-      );
+      let valorAlienacaoFiscal = Math.max(
+  0,
+  venda - (POLITICA_FISCAL.incluirCorretagemNaAlienacao ? corretorAtual : 0)
+);
 
-      let custoFiscal = 0;
+if(dados.tipoPagamento === "financiado"){
+  valorAlienacaoFiscal = Math.max(0, valorAlienacaoFiscal - operacional.saldoDevedor);
+}
 
-      if(dados.tipoPagamento === "financiado"){
-        custoFiscal += dados.entradaValor + operacional.totalPagoFinanciamentoAteVenda;
-      } else {
-        custoFiscal += dados.valorAquisicao;
-      }
+let custoFiscal = 0;
+
+if(dados.tipoPagamento === "financiado"){
+  custoFiscal += dados.entradaValor + operacional.totalPagoFinanciamentoAteVenda;
+} else {
+  custoFiscal += dados.valorAquisicao;
+}
+
 
       if(POLITICA_FISCAL.incluirDocumentacaoNoCusto) custoFiscal += dados.documentacao;
       if(POLITICA_FISCAL.incluirReformaNoCusto) custoFiscal += dados.reforma;
@@ -864,11 +869,13 @@
   setText("finSaldoDevedor", fmtBRL(operacional.saldoDevedor));
 
   setText(
-    "finResumo",
-    dados.tipoPagamento === "financiado"
-      ? "Na venda, o caixa líquido considera o saldo devedor remanescente; no custo fiscal, a base usa entrada + parcelas pagas até o mês analisado."
-      : "No cenário à vista não há saldo devedor, amortização nem juros acumulados."
-  );
+  "finResumo",
+  dados.tipoPagamento === "financiado"
+    ? "Na venda, a base do IR considera a alienação líquida após corretagem e quitação do saldo devedor, para manter coerência com o ganho efetivo da operação."
+    : "No cenário à vista não há saldo devedor, amortização nem juros acumulados."
+);
+
+  
 }
 
     
