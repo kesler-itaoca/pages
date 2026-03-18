@@ -5,39 +5,30 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Itaoca – Viabilidade de Investimento</title>
 
-  <!-- Fonte premium -->
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&display=swap" rel="stylesheet">
-
-  <!-- CSS externo -->
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
 
-  <!-- HEADER PREMIUM ITAOCA -->
   <header class="header-itaoca">
-  <img 
-    src="https://yata-apix-26d89c64-255e-44a8-a7e2-98a7a639f851.s3-object.locaweb.com.br/b057cb744b064181a08c9d4ce88202bf.jpg"
-    alt="Logo Itaoca"
-    class="logo-itaoca">
+    <img
+      src="https://yata-apix-26d89c64-255e-44a8-a7e2-98a7a639f851.s3-object.locaweb.com.br/b057cb744b064181a08c9d4ce88202bf.jpg"
+      alt="Logo Itaoca"
+      class="logo-itaoca"
+    />
 
-  <div class="header-text">
-    <h1>Viabilidade de Investimento</h1>
-  </div>
-</header>
+    <div class="header-text">
+      <h1>Viabilidade de Investimento</h1>
+    </div>
+  </header>
 
-
-
-  <!-- Linha dourada -->
   <div class="header-gold-line"></div>
 
   <main class="wrap">
-
     <div class="grid">
 
-      <!-- COLUNA ESQUERDA – FORMULÁRIO -->
       <section class="card">
-
         <h2 class="section-title">Dados principais do negócio</h2>
 
         <div class="form-grid">
@@ -50,7 +41,6 @@
             <label>Valor de venda projetado (R$)</label>
             <input id="valorVenda" type="text" />
           </div>
-			
 
           <div class="field">
             <label>Tipo de pagamento</label>
@@ -59,31 +49,28 @@
               <option value="financiado">Financiado</option>
             </select>
           </div>
-		  
-		  <div class="field">
-			  <label>Plano contratado</label>
-			  <select id="plano">
-				<option value="0">Selecione...</option>
-				<option value="2000">Classic – R$ 2.000,00</option>
-				<option value="5000">Gold – R$ 5.000,00</option>
-				<option value="7000">Exclusive – R$ 7.000,00</option>
-				<option value="10000">Prime – R$ 10.000,00</option>
-				<option value="25000">Private – R$ 25.000,00</option>
-			  </select>
-			</div>
 
+          <div class="field">
+            <label>Plano contratado</label>
+            <select id="plano">
+              <option value="0">Selecione...</option>
+              <option value="2000">Classic – R$ 2.000,00</option>
+              <option value="5000">Gold – R$ 5.000,00</option>
+              <option value="7000">Exclusive – R$ 7.000,00</option>
+              <option value="10000">Prime – R$ 10.000,00</option>
+              <option value="25000">Private – R$ 25.000,00</option>
+            </select>
+          </div>
 
+          <div class="field">
+            <label>Assessoria sobre aquisição (%)</label>
+            <input id="percAssessoria" type="number" step="0.01" placeholder="%" />
+          </div>
 
-			<div class="field">
-			  <label>Assessoria sobre aquisição</label>
-			  <input id="percAssessoria" type="number" step="0.01" placeholder="%" />
-			</div>
-
-			<div class="field">
-			  <label>Valor assessoria (R$)</label>
-			  <input id="valorAssessoria" type="text" disabled />
-			</div>
-
+          <div class="field">
+            <label>Valor assessoria (R$)</label>
+            <input id="valorAssessoria" type="text" disabled />
+          </div>
         </div>
 
         <h2 class="section-title">Custos e despesas</h2>
@@ -186,27 +173,84 @@
           </div>
         </div>
 
-      </section>
-	  
-	        <!-- COLUNA DIREITA – RESULTADOS -->
-      <aside class="card">
+        <div class="actions-row">
+  <button type="button" class="btn-secondary" id="btnLimparSimulacao">
+    Limpar simulação
+  </button>
 
+  <button type="button" class="btn-secondary btn-pdf" id="btnSalvarPDF">
+    Salvar em PDF
+  </button>
+</div>
+
+      </section>
+
+      <aside class="card">
         <h2 class="section-title">Resumo financeiro do cenário</h2>
 
-        <div class="stat">
-          <span class="label">Total desembolso</span>
-          <span class="value money" id="totalDesembolso">R$ 0,00</span>
+        <div class="hero-resultado" id="heroResultado">
+          <div class="hero-status is-neutral" id="statusCenario">
+            Preencha os dados para analisar o cenário
+          </div>
+
+          <div class="hero-valor" id="resultadoOperacao">R$ 0,00</div>
+          <div class="hero-subtitulo">Resultado estimado da operação</div>
+
+          <div class="hero-metrics">
+            <div class="hero-metric">
+              <span class="hero-metric-label">Rentabilidade</span>
+              <strong class="hero-metric-value" id="rentabilidadeTotal">0,00 %</strong>
+            </div>
+
+            <div class="hero-metric">
+              <span class="hero-metric-label">Preço mínimo de venda</span>
+              <strong class="hero-metric-value" id="precoMinimoVenda">R$ 0,00</strong>
+            </div>
+          </div>
         </div>
 
         <div class="stat">
-          <span class="label">Valor de venda considerado</span>
-          <span class="value money" id="valorVendaConsiderado">R$ 0,00</span>
-        </div>
+  <span class="label">Valor de aquisição</span>
+  <span class="value" id="valorAquisicaoResumo">R$ 0,00</span>
+</div>
 
-        <div class="stat">
-          <span class="label">Total de custos fixos</span>
-          <span class="value" id="totalCustosFixos">R$ 0,00</span>
-        </div>
+<div class="stat">
+  <span class="label">Total de custos fixos</span>
+  <span class="value" id="totalCustosFixos">R$ 0,00</span>
+</div>
+
+<div class="stat">
+  <span class="label">Assessoria</span>
+  <span class="value" id="custoAssessoriaTotal">R$ 0,00</span>
+</div>
+
+<div class="stat">
+  <span class="label">Custos mensais</span>
+  <span class="value" id="custosMensaisResumo">R$ 0,00</span>
+</div>
+
+<div class="stat">
+  <span class="label">Total desembolso</span>
+  <span class="value money" id="totalDesembolso">R$ 0,00</span>
+</div>
+
+<div class="stat">
+  <span class="label">Valor de venda considerado</span>
+  <span class="value money" id="valorVendaConsiderado">R$ 0,00</span>
+</div>
+
+<div class="stat">
+  <span class="label">Corretagem</span>
+  <span class="value" id="custoCorretagem">R$ 0,00</span>
+</div>
+
+<div class="stat">
+  <span class="label">Valor de venda após corretagem</span>
+  <span class="value money" id="valorVendaAposCorretagem">R$ 0,00</span>
+</div>
+
+
+
 
         <p class="small-muted">
           Simulação focada em custos diretos do negócio, sem considerar IR sobre ganho de capital.
@@ -214,385 +258,466 @@
 
         <hr class="divider" />
 
-        <h2 class="section-title">Projeção de lucro mês a mês</h2>
+        <h2 class="section-title">Evolução do resultado estimado</h2>
 
         <p class="small-muted">
-          Lucro líquido e percentual considerando venda em cada mês (até 12 meses).
+          Resultado estimado e rentabilidade considerando venda em cada mês (até 12 meses).
         </p>
 
         <div class="meses-grid" id="listaLucroMeses"></div>
-
       </aside>
 
-    </div> <!-- fim .grid -->
-
+    </div>
   </main>
-		
-	<script>
-	/* ============================================================
-   FUNÇÕES DE FORMATAÇÃO
-   ============================================================ */
 
-function parseCurrency(raw){
-  if(raw === undefined || raw === null) return 0;
-  if(typeof raw === "number") return raw;
+  <script>
+    function parseCurrency(raw){
+      if(raw === undefined || raw === null) return 0;
+      if(typeof raw === "number") return raw;
 
-  raw = String(raw).trim();
-  if(raw === "") return 0;
+      raw = String(raw).trim();
+      if(raw === "") return 0;
 
-  raw = raw.replace(/\s/g,"").replace(/^R\$/i,"");
+      raw = raw.replace(/\s/g, "").replace(/^R\$/i, "");
 
-  if(raw.indexOf(",") > -1 && raw.indexOf(".") > -1){
-    raw = raw.replace(/\./g,"").replace(",",";");
-  }
+      if(raw.indexOf(",") > -1 && raw.indexOf(".") > -1){
+        raw = raw.replace(/\./g, "").replace(",", ";");
+      }
 
-  raw = raw.replace(",",".").replace(";",".");
-  const n = parseFloat(raw);
-  return isNaN(n) ? 0 : n;
-}
-
-function fmtBRL(v){
-  return Number(v||0).toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
-}
-
-function fmtNumberInput(v){
-  return Number(v||0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2});
-}
-
-/* ============================================================
-   CÁLCULO DE FINANCIAMENTO (SAC / PRICE)
-   ============================================================ */
-
-function calcFinDetalhado(valorFin, taxaAnual, prazoTotal, mesesConsiderados, sistema){
-  const i = (taxaAnual/100)/12;
-  let jurosAcum = 0;
-  let principalPago = 0;
-  let parcela = 0;
-  let saldo = valorFin;
-
-  if(prazoTotal <= 0 || valorFin <= 0){
-    return {jurosAcum:0, principalPago:0, parcela:0, saldoDevedor:valorFin};
-  }
-
-  if(sistema === "PRICE"){
-    if(i === 0){
-      parcela = valorFin / prazoTotal;
-    } else {
-      parcela = valorFin * (i * Math.pow(1+i,prazoTotal)) / (Math.pow(1+i,prazoTotal)-1);
+      raw = raw.replace(",", ".").replace(";", ".");
+      const n = parseFloat(raw);
+      return isNaN(n) ? 0 : n;
     }
 
-    let meses = Math.min(mesesConsiderados, prazoTotal);
-
-    for(let m=1; m<=meses; m++){
-      const jurosMes = saldo * i;
-      const amort = parcela - jurosMes;
-      const amortReal = Math.max(0, amort);
-
-      jurosAcum += jurosMes;
-      principalPago += amortReal;
-      saldo = Math.max(0, saldo - amortReal);
+    function fmtBRL(v){
+      return Number(v || 0).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      });
     }
 
-    return {jurosAcum, principalPago, parcela, saldoDevedor:saldo};
-  }
+    function fmtNumberInput(v){
+      return Number(v || 0).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
 
-  // SAC
-  const amort = valorFin / prazoTotal;
-  let primeiraParcela = 0;
-  let meses = Math.min(mesesConsiderados, prazoTotal);
+    function calcFinDetalhado(valorFin, taxaAnual, prazoTotal, mesesConsiderados, sistema){
+      const i = (taxaAnual / 100) / 12;
+      let jurosAcum = 0;
+      let principalPago = 0;
+      let parcela = 0;
+      let saldo = valorFin;
 
-  for(let m=1; m<=meses; m++){
-    const jurosMes = saldo * i;
-    const parcelaMes = amort + jurosMes;
+      if(prazoTotal <= 0 || valorFin <= 0){
+        return { jurosAcum: 0, principalPago: 0, parcela: 0, saldoDevedor: valorFin };
+      }
 
-    if(m === 1) primeiraParcela = parcelaMes;
+      if(sistema === "PRICE"){
+        if(i === 0){
+          parcela = valorFin / prazoTotal;
+        } else {
+          parcela = valorFin * (i * Math.pow(1 + i, prazoTotal)) / (Math.pow(1 + i, prazoTotal) - 1);
+        }
 
-    jurosAcum += jurosMes;
-    principalPago += amort;
-    saldo = Math.max(0, saldo - amort);
-  }
+        const meses = Math.min(mesesConsiderados, prazoTotal);
 
-  return {jurosAcum, principalPago, parcela:primeiraParcela, saldoDevedor:saldo};
-}
+        for(let m = 1; m <= meses; m++){
+          const jurosMes = saldo * i;
+          const amort = parcela - jurosMes;
+          const amortReal = Math.max(0, amort);
 
-/* ============================================================
-   BLOQUEIO DE CAMPOS DE FINANCIAMENTO
-   ============================================================ */
+          jurosAcum += jurosMes;
+          principalPago += amortReal;
+          saldo = Math.max(0, saldo - amortReal);
+        }
 
-function setFinancingBlock(disabled){
-  const ids = ["entradaPerc","jurosAnual","prazoFinanciamento","sistema"];
-  ids.forEach(id=>{
-    const el = document.getElementById(id);
-    if(!el) return;
-    el.disabled = !!disabled;
-    if(disabled) el.value = "";
-  });
-}
+        return { jurosAcum, principalPago, parcela, saldoDevedor: saldo };
+      }
 
-function handleTipoPagamentoChange(){
-  const tipo = (document.getElementById("tipoPagamento")?.value || "avista").toLowerCase();
+      const amort = valorFin / prazoTotal;
+      let primeiraParcela = 0;
+      const meses = Math.min(mesesConsiderados, prazoTotal);
 
-  if(tipo === "avista"){
-    setFinancingBlock(true);
-  } else {
-    setFinancingBlock(false);
-    const sistemaEl = document.getElementById("sistema");
-    if(sistemaEl && (!sistemaEl.value || sistemaEl.value === "")) sistemaEl.value = "SAC";
-  }
+      for(let m = 1; m <= meses; m++){
+        const jurosMes = saldo * i;
+        const parcelaMes = amort + jurosMes;
 
-  calcular();
-}
+        if(m === 1) primeiraParcela = parcelaMes;
 
-/* ============================================================
-   FORMATAÇÃO AUTOMÁTICA DE CAMPOS MONETÁRIOS
-   ============================================================ */
+        jurosAcum += jurosMes;
+        principalPago += amort;
+        saldo = Math.max(0, saldo - amort);
+      }
 
-const moneyFields = [
-  "valorAquisicao","valorVenda","dividas","reforma","honorarios",
-  "condMensal","iptuMensal"
-];
+      return { jurosAcum, principalPago, parcela: primeiraParcela, saldoDevedor: saldo };
+    }
 
-function attachCurrencyFormatting(){
-  moneyFields.forEach(id=>{
-    const el = document.getElementById(id);
-    if(!el) return;
+    function setFinancingBlock(disabled){
+      const ids = ["entradaPerc", "jurosAnual", "prazoFinanciamento", "sistema"];
 
-    el.addEventListener("focus", function(){
-      const n = parseCurrency(this.value);
-      this.value = n ? n.toFixed(2).replace(".",",") : "";
-    });
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.disabled = !!disabled;
+        if(disabled) el.value = "";
+      });
+    }
 
-    el.addEventListener("blur", function(){
-      const n = parseCurrency(this.value);
-      if(n === 0 && String(this.value).trim() === ""){
-        this.value = "";
-        calcular();
+    function handleTipoPagamentoChange(){
+      const tipo = (document.getElementById("tipoPagamento")?.value || "avista").toLowerCase();
+
+      if(tipo === "avista"){
+        setFinancingBlock(true);
+      } else {
+        setFinancingBlock(false);
+        const sistemaEl = document.getElementById("sistema");
+        if(sistemaEl && (!sistemaEl.value || sistemaEl.value === "")) sistemaEl.value = "SAC";
+      }
+
+      calcular();
+    }
+
+    const moneyFields = [
+      "valorAquisicao",
+      "valorVenda",
+      "dividas",
+      "reforma",
+      "honorarios",
+      "condMensal",
+      "iptuMensal"
+    ];
+
+    function attachCurrencyFormatting(){
+      moneyFields.forEach(id => {
+        const el = document.getElementById(id);
+        if(!el) return;
+
+        el.addEventListener("focus", function(){
+          const n = parseCurrency(this.value);
+          this.value = n ? n.toFixed(2).replace(".", ",") : "";
+        });
+
+        el.addEventListener("blur", function(){
+          const n = parseCurrency(this.value);
+
+          if(n === 0 && String(this.value).trim() === ""){
+            this.value = "";
+            calcular();
+            return;
+          }
+
+          this.value = fmtNumberInput(n);
+          calcular();
+        });
+      });
+    }
+
+    function atualizarPercentuais(){
+      const valorAquisicao = parseCurrency(document.getElementById("valorAquisicao").value);
+      const valorVenda = parseCurrency(document.getElementById("valorVenda").value);
+
+      const docPerc = (parseFloat(document.getElementById("documentacaoPerc").value) || 0) / 100;
+      const leiPerc = (parseFloat(document.getElementById("leiloeiroPerc").value) || 0) / 100;
+      const corPerc = (parseFloat(document.getElementById("corretorPerc").value) || 0) / 100;
+      const percAss = (parseFloat(document.getElementById("percAssessoria").value) || 0) / 100;
+
+      const docVal = valorAquisicao * docPerc;
+      const leiVal = valorAquisicao * leiPerc;
+      const corVal = valorVenda * corPerc;
+      const valorAssessoria = valorAquisicao * percAss;
+
+      document.getElementById("valorAssessoria").value = valorAssessoria ? fmtBRL(valorAssessoria) : "";
+      document.getElementById("documentacao").value = docVal ? fmtBRL(docVal) : "";
+      document.getElementById("leiloeiro").value = leiVal ? fmtBRL(leiVal) : "";
+      document.getElementById("corretor").value = corVal ? fmtBRL(corVal) : "";
+    }
+
+    function getCorretorPercAtual(){
+      return (parseFloat(document.getElementById("corretorPerc")?.value) || 0) / 100;
+    }
+
+    function calcularPrecoMinimoVenda(cenario){
+      const percCorretor = getCorretorPercAtual();
+      const saldo = cenario.tipoPagamento === "financiado" ? cenario.saldoDevedor : 0;
+      const divisor = 1 - percCorretor;
+
+      if(divisor <= 0) return 0;
+      return (cenario.desembolso + saldo) / divisor;
+    }
+
+    function atualizarStatusCenario(cenario){
+      const el = document.getElementById("statusCenario");
+      if(!el) return;
+
+      el.classList.remove("is-neutral", "is-good", "is-bad", "is-warning");
+
+      if(cenario.desembolso <= 0 || cenario.valorVendaBruto <= 0){
+        el.textContent = "Preencha os dados para analisar o cenário";
+        el.classList.add("is-neutral");
         return;
       }
-      this.value = fmtNumberInput(n);
-      calcular();
-    });
-  });
-}
 
-/* ============================================================
-   ATUALIZAÇÃO DE PERCENTUAIS
-   ============================================================ */
+      const rentabilidade = cenario.desembolso > 0
+        ? (cenario.lucroLiquido / cenario.desembolso) * 100
+        : 0;
 
-function atualizarPercentuais(){
-  const valorAquisicao = parseCurrency(document.getElementById("valorAquisicao").value);
-  const valorVenda = parseCurrency(document.getElementById("valorVenda").value);
+      if(cenario.lucroLiquido < 0){
+        el.textContent = "Operação inviável";
+        el.classList.add("is-bad");
+        return;
+      }
 
-  const docPerc = (parseFloat(document.getElementById("documentacaoPerc").value) || 0) / 100;
-  const leiPerc = (parseFloat(document.getElementById("leiloeiroPerc").value) || 0) / 100;
-  const corPerc = (parseFloat(document.getElementById("corretorPerc").value) || 0) / 100;
+      if(rentabilidade < 15){
+        el.textContent = "Margem sensível";
+        el.classList.add("is-warning");
+        return;
+      }
 
-  const docVal = valorAquisicao * docPerc;
-  const leiVal = valorAquisicao * leiPerc;
-  const corVal = valorVenda * corPerc;
-  
-  // Assessoria (% sobre aquisição)
-	const percAss = (parseFloat(document.getElementById("percAssessoria").value) || 0) / 100;
-	const valorAquisicao2 = parseCurrency(document.getElementById("valorAquisicao").value);
-	const valorAssessoria = valorAquisicao2 * percAss;
-	
-const planoVal = parseFloat(document.getElementById("plano").value) || 0;
-// não escreve mais no input, pois ele não existe
-  document.getElementById("valorAssessoria").value =  valorAssessoria ? fmtBRL(valorAssessoria) : "";
-  
-  document.getElementById("documentacao").value = docVal ? fmtBRL(docVal) : "";
-  document.getElementById("leiloeiro").value = leiVal ? fmtBRL(leiVal) : "";
-  document.getElementById("corretor").value = corVal ? fmtBRL(corVal) : "";
-}
+      el.textContent = "Operação atrativa";
+      el.classList.add("is-good");
+    }
 
-/* ============================================================
-   CÁLCULO DO CENÁRIO
-   ============================================================ */
+    function calcularCenario(prazoConsideradoMeses){
+      const tipoPagamento = (document.getElementById("tipoPagamento").value || "avista").toLowerCase();
+      const valorAquisicao = parseCurrency(document.getElementById("valorAquisicao").value);
+      const valorVenda = parseCurrency(document.getElementById("valorVenda").value);
 
-function calcularCenario(prazoConsideradoMeses){
-  const tipoPagamento = (document.getElementById("tipoPagamento").value || "avista").toLowerCase();
-  const valorAquisicao = parseCurrency(document.getElementById("valorAquisicao").value);
-  const valorVenda = parseCurrency(document.getElementById("valorVenda").value);
+      const plano = parseFloat(document.getElementById("plano").value) || 0;
+      const valorAssessoria = parseCurrency(document.getElementById("valorAssessoria").value);
 
-const plano = parseFloat(document.getElementById("plano").value) || 0;
-const valorAssessoria2 = parseCurrency(document.getElementById("valorAssessoria").value);
+      const entradaPerc = parseFloat(document.getElementById("entradaPerc").value) || 0;
+      const jurosAnual = parseFloat(document.getElementById("jurosAnual").value) || 0;
+      const prazoFin = Math.max(0, parseInt(document.getElementById("prazoFinanciamento").value) || 0);
+      const sistema = document.getElementById("sistema").value || "SAC";
 
-  const entradaPerc = (parseFloat(document.getElementById("entradaPerc").value) || 0);
-  const jurosAnual = (parseFloat(document.getElementById("jurosAnual").value) || 0);
-  const prazoFin = Math.max(0, parseInt(document.getElementById("prazoFinanciamento").value) || 0);
-  const sistema = document.getElementById("sistema").value || "SAC";
+      const entradaValor = valorAquisicao * (entradaPerc / 100);
 
-  const entradaValor = valorAquisicao * (entradaPerc/100);
+      let valorFinanciado = 0;
+      let parcela = 0;
+      let totalPagoFinanciamentoAteVenda = 0;
+      let saldoDevedor = 0;
 
-  let valorFinanciado = 0;
-  let parcela = 0;
-  let totalPagoFinanciamentoAteVenda = 0;
-  let saldoDevedor = 0;
+      if(tipoPagamento === "financiado" && valorAquisicao > 0 && prazoFin > 0){
+        valorFinanciado = Math.max(0, valorAquisicao - entradaValor);
 
-  if(tipoPagamento === "financiado" && valorAquisicao > 0 && prazoFin > 0){
-    valorFinanciado = Math.max(0, valorAquisicao - entradaValor);
+        const fin = calcFinDetalhado(
+          valorFinanciado,
+          jurosAnual,
+          prazoFin,
+          prazoConsideradoMeses,
+          sistema
+        );
 
-    const fin = calcFinDetalhado(valorFinanciado, jurosAnual, prazoFin, prazoConsideradoMeses, sistema);
+        parcela = fin.parcela;
+        totalPagoFinanciamentoAteVenda = fin.jurosAcum + fin.principalPago;
+        saldoDevedor = fin.saldoDevedor;
+      }
 
-    parcela = fin.parcela;
-    totalPagoFinanciamentoAteVenda = fin.jurosAcum + fin.principalPago;
-    saldoDevedor = fin.saldoDevedor;
-  }
+      atualizarPercentuais();
 
-  atualizarPercentuais();
+      const documentacao = parseCurrency(document.getElementById("documentacao").value);
+      const dividas = parseCurrency(document.getElementById("dividas").value);
+      const reforma = parseCurrency(document.getElementById("reforma").value);
+      const honorarios = parseCurrency(document.getElementById("honorarios").value);
+      const leiloeiro = parseCurrency(document.getElementById("leiloeiro").value);
+      const corretor = parseCurrency(document.getElementById("corretor").value);
+      const condMensal = parseCurrency(document.getElementById("condMensal").value);
+      const iptuMensal = parseCurrency(document.getElementById("iptuMensal").value);
 
-  const documentacao = parseCurrency(document.getElementById("documentacao").value);
-  const dividas = parseCurrency(document.getElementById("dividas").value);
-  const reforma = parseCurrency(document.getElementById("reforma").value);
-  const honorarios = parseCurrency(document.getElementById("honorarios").value);
-  const leiloeiro = parseCurrency(document.getElementById("leiloeiro").value);
-  const corretor = parseCurrency(document.getElementById("corretor").value);
-  const condMensal = parseCurrency(document.getElementById("condMensal").value);
-  const iptuMensal = parseCurrency(document.getElementById("iptuMensal").value);
+      const condTotal = condMensal * prazoConsideradoMeses;
+      const iptuTotal = iptuMensal * prazoConsideradoMeses;
 
-  const condTotal = condMensal * prazoConsideradoMeses;
-  const iptuTotal = iptuMensal * prazoConsideradoMeses;
+      const custosFixos = documentacao + dividas + reforma + honorarios + leiloeiro;
+      const custosTempo = condTotal + iptuTotal;
 
-  const custosFixos =
-    documentacao + dividas + reforma + honorarios + leiloeiro;
+      let desembolso = 0;
 
-  const custosTempo = condTotal + iptuTotal;
+      if(tipoPagamento === "avista"){
+        desembolso = valorAquisicao + custosFixos + custosTempo + plano + valorAssessoria;
+      } else {
+        desembolso = entradaValor + totalPagoFinanciamentoAteVenda + custosFixos + custosTempo + plano + valorAssessoria;
+      }
 
-  let desembolso = 0;
+      const valorVendaBruto = valorVenda;
+      let valorVendaLiquido = valorVendaBruto - corretor;
 
-  if(tipoPagamento === "avista"){
-    desembolso = valorAquisicao + custosFixos + custosTempo + plano + valorAssessoria2;
-  } else {
-    desembolso = entradaValor + totalPagoFinanciamentoAteVenda + custosFixos + custosTempo + plano + valorAssessoria2;
-  }
+      if(tipoPagamento === "financiado"){
+        valorVendaLiquido -= saldoDevedor;
+      }
 
-  const valorVendaBruto = valorVenda;
-  let valorVendaLiquido = valorVendaBruto - corretor;
+      const lucroLiquido = valorVendaLiquido - desembolso;
 
-  if(tipoPagamento === "financiado"){
-    valorVendaLiquido -= saldoDevedor;
-  }
+      return {
+        tipoPagamento,
+        valorAquisicao,
+        valorVendaBruto,
+        prazoConsideradoMeses,
+        entradaPerc,
+        entradaValor,
+        valorFinanciado,
+        parcela,
+        totalPagoFinanciamentoAteVenda,
+        saldoDevedor,
+        documentacao,
+        dividas,
+        reforma,
+        honorarios,
+        leiloeiro,
+        corretor,
+        condTotal,
+        iptuTotal,
+        custosFixos,
+        custosTempo,
+        plano,
+        valorAssessoria,
+        desembolso,
+        valorVendaLiquido,
+        lucroLiquido
+      };
+    }
 
-  const lucroLiquido = valorVendaLiquido - desembolso;
-
-  return {
-    tipoPagamento,
-    valorAquisicao,
-    valorVendaBruto,
-    prazoConsideradoMeses,
-    entradaPerc,
-    entradaValor,
-    valorFinanciado,
-    parcela,
-    totalPagoFinanciamentoAteVenda,
-    saldoDevedor,
-    documentacao,
-    dividas,
-    reforma,
-    honorarios,
-    leiloeiro,
-    corretor,
-    condTotal,
-    iptuTotal,
-    custosFixos,
-    custosTempo,
-	plano,
-    valorAssessoria2,
-    desembolso,
-    valorVendaLiquido,
-    lucroLiquido
-  };
-}
-
-/* ============================================================
-   CÁLCULO GERAL + ATUALIZAÇÃO DA TELA
-   ============================================================ */
-
-function calcular(){
+    function calcular(){
   const prazoMeses = 12;
-
   const cFinal = calcularCenario(prazoMeses);
+  const valorVendaAposCorretagem = cFinal.valorVendaBruto - cFinal.corretor;
 
+  document.getElementById("valorAquisicaoResumo").textContent = fmtBRL(cFinal.valorAquisicao);
+  document.getElementById("totalCustosFixos").textContent = fmtBRL(cFinal.custosFixos);
+  document.getElementById("custoAssessoriaTotal").textContent = fmtBRL(cFinal.plano + cFinal.valorAssessoria);
+  document.getElementById("custosMensaisResumo").textContent = fmtBRL(cFinal.custosTempo);
   document.getElementById("totalDesembolso").textContent = fmtBRL(cFinal.desembolso);
   document.getElementById("valorVendaConsiderado").textContent = fmtBRL(cFinal.valorVendaBruto);
-  document.getElementById("totalCustosFixos").textContent = fmtBRL(cFinal.custosFixos);
+  document.getElementById("custoCorretagem").textContent = fmtBRL(cFinal.corretor);
+  document.getElementById("valorVendaAposCorretagem").textContent = fmtBRL(valorVendaAposCorretagem);
 
   document.getElementById("entradaValor").value = cFinal.entradaValor ? fmtBRL(cFinal.entradaValor) : "";
   document.getElementById("valorFinanciadoDisplay").value = cFinal.valorFinanciado ? fmtBRL(cFinal.valorFinanciado) : "";
   document.getElementById("parcelaDisplay").value = cFinal.parcela ? fmtBRL(cFinal.parcela) : "";
   document.getElementById("totalPagoFinAteVenda").value = cFinal.totalPagoFinanciamentoAteVenda ? fmtBRL(cFinal.totalPagoFinanciamentoAteVenda) : "";
 
+  const rentabilidade = cFinal.desembolso > 0
+    ? (cFinal.lucroLiquido / cFinal.desembolso) * 100
+    : 0;
+
+  document.getElementById("resultadoOperacao").textContent = fmtBRL(cFinal.lucroLiquido);
+  document.getElementById("rentabilidadeTotal").textContent = `${rentabilidade.toFixed(2)} %`;
+  document.getElementById("precoMinimoVenda").textContent = fmtBRL(calcularPrecoMinimoVenda(cFinal));
+
+  atualizarStatusCenario(cFinal);
+
   const lista = document.getElementById("listaLucroMeses");
+  lista.innerHTML = "";
 
-  if(lista){
-    lista.innerHTML = "";
+  for(let m = 1; m <= prazoMeses; m++){
+    const cMes = calcularCenario(m);
+    const percMes = cMes.desembolso > 0 ? (cMes.lucroLiquido / cMes.desembolso) * 100 : 0;
 
-    const colEsq = document.createElement("div");
-    colEsq.className = "meses-col";
+    const card = document.createElement("div");
+    card.className = "mes-card";
 
-    const colDir = document.createElement("div");
-    colDir.className = "meses-col";
-
-    for(let m=1; m<=prazoMeses; m++){
-      const cMes = calcularCenario(m);
-      const percMes = cMes.desembolso > 0 ? (cMes.lucroLiquido / cMes.desembolso) * 100 : 0;
-
-      const card = document.createElement("div");
-      card.className = "mes-card";
-      card.innerHTML = `
-        <div class="mes-title">Mês ${m}</div>
-        <div class="mes-value">${fmtBRL(cMes.lucroLiquido)}</div>
-        <div class="mes-perc">${percMes.toFixed(2)} %</div>
-      `;
-
-      if(m <= 6){
-        colEsq.appendChild(card);
-      } else {
-        colDir.appendChild(card);
-      }
+    if(cMes.lucroLiquido < 0){
+      card.classList.add("is-negative");
+    } else if(percMes < 15){
+      card.classList.add("is-warning");
+    } else {
+      card.classList.add("is-positive");
     }
 
-    lista.appendChild(colEsq);
-    lista.appendChild(colDir);
+    card.innerHTML = `
+      <div class="mes-title">Mês ${m}</div>
+      <div class="mes-value">${fmtBRL(cMes.lucroLiquido)}</div>
+      <div class="mes-perc">${percMes.toFixed(2)} %</div>
+    `;
+
+    lista.appendChild(card);
   }
 }
 
-/* ============================================================
-   INICIALIZAÇÃO
-   ============================================================ */
 
-document.addEventListener("DOMContentLoaded", function(){
-  attachCurrencyFormatting();
+    function limparSimulacao(){
+      const idsLimpar = [
+        "valorAquisicao",
+        "valorVenda",
+        "percAssessoria",
+        "valorAssessoria",
+        "documentacaoPerc",
+        "documentacao",
+        "leiloeiroPerc",
+        "leiloeiro",
+        "corretorPerc",
+        "corretor",
+        "dividas",
+        "reforma",
+        "honorarios",
+        "condMensal",
+        "iptuMensal",
+        "entradaPerc",
+        "entradaValor",
+        "jurosAnual",
+        "prazoFinanciamento",
+        "valorFinanciadoDisplay",
+        "parcelaDisplay",
+        "totalPagoFinAteVenda"
+      ];
 
-  document.getElementById("tipoPagamento").addEventListener("change", handleTipoPagamentoChange);
-  document.getElementById("entradaPerc").addEventListener("input", calcular);
-  document.getElementById("jurosAnual").addEventListener("input", calcular);
-  document.getElementById("prazoFinanciamento").addEventListener("input", calcular);
-  document.getElementById("sistema").addEventListener("change", calcular);
-  
-  document.getElementById("plano").addEventListener("change", function(){
-  atualizarPercentuais();
-  calcular();
-});
+      idsLimpar.forEach(id => {
+        const el = document.getElementById(id);
+        if(el) el.value = "";
+      });
 
-document.getElementById("percAssessoria").addEventListener("input", function(){
-  atualizarPercentuais();
-  calcular();
-});
+      document.getElementById("tipoPagamento").value = "avista";
+      document.getElementById("plano").value = "0";
+      document.getElementById("sistema").value = "SAC";
 
-  ["documentacaoPerc","leiloeiroPerc","corretorPerc"].forEach(id=>{
-    const el = document.getElementById(id);
-    if(el) el.addEventListener("input", function(){
       atualizarPercentuais();
+      handleTipoPagamentoChange();
+    }
+
+	function salvarPDF(){
+  window.print();
+}
+
+
+    document.addEventListener("DOMContentLoaded", function(){
+      attachCurrencyFormatting();
+
+      document.getElementById("tipoPagamento").addEventListener("change", handleTipoPagamentoChange);
+      document.getElementById("entradaPerc").addEventListener("input", calcular);
+      document.getElementById("jurosAnual").addEventListener("input", calcular);
+      document.getElementById("prazoFinanciamento").addEventListener("input", calcular);
+      document.getElementById("sistema").addEventListener("change", calcular);
+
+      document.getElementById("plano").addEventListener("change", function(){
+        atualizarPercentuais();
+        calcular();
+      });
+
+      document.getElementById("percAssessoria").addEventListener("input", function(){
+        atualizarPercentuais();
+        calcular();
+      });
+
+      ["documentacaoPerc", "leiloeiroPerc", "corretorPerc"].forEach(id => {
+        const el = document.getElementById(id);
+        if(el){
+          el.addEventListener("input", function(){
+            atualizarPercentuais();
+            calcular();
+          });
+        }
+      });
+
+      document.getElementById("btnLimparSimulacao").addEventListener("click", limparSimulacao);
+	  
+	  document.getElementById("btnSalvarPDF").addEventListener("click", salvarPDF);
+
+
+      handleTipoPagamentoChange();
       calcular();
     });
-  });
-
-  handleTipoPagamentoChange();
-  calcular();
-});
-	
-	</script>
+  </script>
 
 </body>
 </html>
