@@ -1,0 +1,551 @@
+.quant2-wrap {
+  display: grid;
+  gap: 18px;
+}
+
+.toolbar-quant2 {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+}
+
+.top-switch {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 0 16px 0;
+}
+
+.top-switch .btn-secondary,
+.top-switch .btn-primary {
+  min-width: 170px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.top-switch .btn-primary.is-current {
+  pointer-events: none;
+  filter: saturate(1.05);
+  box-shadow: 0 10px 20px rgba(166,130,61,0.22);
+}
+
+.hero-quant2 {
+  margin-bottom: 0;
+}
+
+.hero-topline {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 180px;
+  gap: 18px;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+.score-box {
+  border: 1px solid rgba(255,255,255,0.14);
+  background: rgba(255,255,255,0.08);
+  border-radius: 16px;
+  padding: 16px 14px;
+  text-align: center;
+}
+
+.score-label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.72);
+  letter-spacing: 0.3px;
+  margin-bottom: 4px;
+}
+
+.score-value {
+  display: block;
+  font-size: 2.05rem;
+  line-height: 1;
+  font-weight: 900;
+  color: #FFFFFF;
+  margin-bottom: 6px;
+}
+
+.score-caption {
+  display: block;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.68);
+}
+
+.hero-metrics-4 {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.kpi-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.kpi-grid-6 {
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+}
+
+.kpi-box {
+  background: linear-gradient(180deg, rgba(27,58,60,0.035), rgba(166,130,61,0.06));
+  border: 1px solid rgba(166,130,61,0.18);
+  border-radius: 14px;
+  padding: 14px 16px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.65);
+  min-width: 0;
+}
+
+.kpi-label {
+  display: block;
+  font-size: 0.77rem;
+  font-weight: 600;
+  color: #6B7280;
+  margin-bottom: 6px;
+}
+
+.kpi-value {
+  display: block;
+  font-size: 1rem;
+  font-weight: 800;
+  color: #1B3A3C;
+  line-height: 1.2;
+  word-break: break-word;
+}
+
+.quant2-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 24px);
+}
+
+.support-panel-gap {
+  margin-top: 16px;
+}
+
+.support-text {
+  margin: 0;
+  color: #4B5563;
+  line-height: 1.65;
+  font-size: 0.9rem;
+  white-space: pre-wrap;
+}
+
+.diagnostico-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.diag-box {
+  background: linear-gradient(180deg, rgba(27,58,60,0.035), rgba(166,130,61,0.05));
+  border: 1px solid rgba(27,58,60,0.08);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+
+.diag-label {
+  display: block;
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: #6B7280;
+  margin-bottom: 6px;
+}
+
+.diag-value {
+  display: block;
+  font-size: 1.2rem;
+  font-weight: 900;
+  color: #1B3A3C;
+}
+
+.table-wrap {
+  overflow-x: auto;
+}
+
+.quant-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+.quant-table th,
+.quant-table td {
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  text-align: left;
+  vertical-align: middle;
+}
+
+.quant-table th {
+  background: rgba(27,58,60,0.035);
+  color: #1B3A3C;
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.quant-table td {
+  font-size: 0.88rem;
+  color: #374151;
+}
+
+.quant-table .row-highlight td {
+  background: rgba(166,130,61,0.07);
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 88px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: capitalize;
+  border: 1px solid transparent;
+}
+
+.pill-sim,
+.pill-baixa,
+.pill-nao {
+  background: rgba(22,163,74,0.12);
+  color: #166534;
+  border-color: rgba(22,163,74,0.18);
+}
+
+.pill-alta {
+  background: rgba(220,38,38,0.12);
+  color: #B91C1C;
+  border-color: rgba(220,38,38,0.18);
+}
+
+.pill-media,
+.pill-pendente,
+.pill-provavel,
+.pill-nao-sabemos {
+  background: rgba(245,158,11,0.14);
+  color: #92400E;
+  border-color: rgba(245,158,11,0.18);
+}
+
+.pill-vago {
+  background: rgba(22,163,74,0.12);
+  color: #166534;
+  border-color: rgba(22,163,74,0.18);
+}
+
+.mini-title {
+  margin: 0 0 8px 0;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #1B3A3C;
+}
+
+.meses-grid-quant2 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.quant-mes-card {
+  position: relative;
+  overflow: hidden;
+  background: #FFFFFF;
+  border: 1px solid rgba(166,130,61,0.26);
+  border-radius: 14px;
+  padding: 15px 16px;
+  box-shadow: 0 8px 18px rgba(0,0,0,0.06);
+}
+
+.quant-mes-card::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 5px;
+  height: 100%;
+  background: linear-gradient(180deg, var(--dourado-itaoca), var(--dourado-claro));
+}
+
+.quant-mes-card.is-bad::before {
+  background: linear-gradient(180deg, #dc2626, #f87171);
+}
+
+.quant-mes-card.is-warning::before {
+  background: linear-gradient(180deg, #f59e0b, #fbbf24);
+}
+
+.quant-mes-card.is-good::before {
+  background: linear-gradient(180deg, #16a34a, #4ade80);
+}
+
+.quant-mes-topo {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.quant-mes-titulo {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #1B3A3C;
+}
+
+.quant-mes-tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #35595B;
+  background: rgba(27,58,60,0.07);
+  border: 1px solid rgba(27,58,60,0.10);
+  padding: 4px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.quant-mes-valor {
+  font-size: 1.12rem;
+  font-weight: 900;
+  color: #111827;
+  line-height: 1.15;
+  margin-bottom: 4px;
+}
+
+.quant-mes-subtitulo {
+  font-size: 0.78rem;
+  color: #6B7280;
+  margin-bottom: 12px;
+}
+
+.linha-mini {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 10px;
+  align-items: center;
+  padding: 7px 0;
+  border-top: 1px solid rgba(0,0,0,0.06);
+}
+
+.linha-mini span {
+  font-size: 0.78rem;
+  color: #6B7280;
+}
+
+.linha-mini strong {
+  font-size: 0.82rem;
+  color: #1F2937;
+  text-align: right;
+}
+
+@media (max-width: 1320px) {
+  .kpi-grid-6 {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .meses-grid-quant2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .hero-metrics-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px) {
+  .quant2-grid,
+  .meses-grid-quant2,
+  .kpi-grid-6,
+  .diagnostico-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-topline {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .top-switch,
+  .toolbar-quant2 {
+    justify-content: stretch;
+  }
+
+  .top-switch .btn-secondary,
+  .top-switch .btn-primary,
+  .toolbar-quant2 .btn-secondary,
+  .toolbar-quant2 .btn-primary {
+    width: 100%;
+    min-width: 0;
+  }
+
+  .quant-mes-topo {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media print {
+  .toolbar-quant2,
+  .top-switch {
+    display: none !important;
+  }
+
+  .quant2-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  .meses-grid-quant2 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+
+  .quant-table th,
+  .quant-table td {
+    font-size: 10px !important;
+    padding: 6px 8px !important;
+  }
+
+  .kpi-grid-6 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+
+/* Ajustes visuais jurídicos e bloco lateral */
+.table-wrap-juridico{overflow-x:hidden;}
+.quant-table-juridico{width:100%;min-width:0;table-layout:fixed;}
+.quant-table-juridico th,
+.quant-table-juridico td{padding:14px 16px;word-break:break-word;overflow-wrap:anywhere;}
+.quant-table-juridico th:nth-child(1),
+.quant-table-juridico td:nth-child(1){width:26%;}
+.quant-table-juridico th:nth-child(2),
+.quant-table-juridico td:nth-child(2){width:20%;}
+.quant-table-juridico th:nth-child(3),
+.quant-table-juridico td:nth-child(3){width:54%;}
+.quant-table-juridico tbody tr:last-child td{border-bottom:none;}
+.quant-table-juridico .pill{min-width:110px;}
+
+.support-panel-gap{margin-top:18px;}
+.support-panel{
+  border:1px dashed rgba(166,130,61,0.28);
+  background:linear-gradient(180deg, rgba(255,255,255,0.94), rgba(166,130,61,0.035));
+  border-radius:18px;
+  padding:18px 22px;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,0.7);
+}
+.support-panel .support-title{
+  margin:0 0 10px 0;
+  font-size:1.1rem;
+  line-height:1.25;
+  color:#1B3A3C;
+}
+.support-panel .support-text{
+  font-size:0.98rem;
+  line-height:1.6;
+  color:#4B5563;
+}
+#resumoJuridicoTexto,
+#processosTexto{min-height:0;}
+.ir-faixas-list .stat:last-child{border-bottom:none;}
+
+@media (max-width: 980px){
+  .table-wrap-juridico{overflow-x:auto;}
+  .quant-table-juridico{min-width:720px;}
+}
+
+.quant2-grid{
+  align-items: start;
+}
+
+.quant2-grid > .card{
+  align-self: start;
+}
+
+.table-wrap-juridico{
+  overflow-x: hidden;
+}
+
+.quant-table-juridico{
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.quant-table-juridico th,
+.quant-table-juridico td{
+  word-break: break-word;
+  overflow-wrap: anywhere;
+}
+
+.quant-table-juridico th:nth-child(1),
+.quant-table-juridico td:nth-child(1){
+  width: 24%;
+}
+
+.quant-table-juridico th:nth-child(2),
+.quant-table-juridico td:nth-child(2){
+  width: 18%;
+}
+
+.quant-table-juridico th:nth-child(3),
+.quant-table-juridico td:nth-child(3){
+  width: 58%;
+}
+
+@media (max-width: 980px){
+  .table-wrap-juridico{
+    overflow-x: auto;
+  }
+
+  .quant-table-juridico{
+    min-width: 720px;
+  }
+}
+
+/* Refino da matriz jurídica */
+.quant-table-juridico th,
+.quant-table-juridico td{
+  padding: 10px 16px;
+}
+
+.quant-table-juridico th:nth-child(1),
+.quant-table-juridico td:nth-child(1){
+  width: 23%;
+}
+
+.quant-table-juridico th:nth-child(2),
+.quant-table-juridico td:nth-child(2){
+  width: 24%;
+}
+
+.quant-table-juridico th:nth-child(3),
+.quant-table-juridico td:nth-child(3){
+  width: 53%;
+}
+
+.quant-table-juridico .pill{
+  min-width: 108px;
+  padding: 5px 12px;
+  font-size: 0.72rem;
+}
+
+.quant-table-juridico td:nth-child(2){
+  white-space: nowrap;
+}
+
+.quant-table-juridico td:nth-child(2) .pill{
+  white-space: nowrap;
+}
+
+.quant-table-juridico td,
+.quant-table-juridico th{
+  line-height: 1.2;
+}

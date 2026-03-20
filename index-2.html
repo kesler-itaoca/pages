@@ -1,0 +1,941 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Itaoca Real Estate Quant</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="index-2.css" />
+<style>
+.field-disabled input,
+.field-disabled select,
+.field-disabled textarea {
+  background: rgba(107,114,128,0.08) !important;
+  color: #9CA3AF !important;
+  cursor: not-allowed !important;
+}
+.field-disabled label {
+  opacity: 0.72;
+}
+</style>
+</head>
+<body>
+  <header class="header-itaoca">
+    <img
+      src="https://yata-apix-26d89c64-255e-44a8-a7e2-98a7a639f851.s3-object.locaweb.com.br/b057cb744b064181a08c9d4ce88202bf.jpg"
+      alt="Logo Itaoca"
+      class="logo-itaoca"
+    />
+    <div class="header-text">
+      <h1>Motor de Seleção Quant</h1>
+    </div>
+  </header>
+
+  <div class="header-gold-line"></div>
+
+  <div class="wrap">
+    <div class="top-switch">
+      <a href="index.html" class="btn-secondary">Modo simples</a>
+      <a href="index-2.html" class="btn-primary is-current">Filtro Quant</a>
+    </div>
+  </div>
+
+  <main class="wrap index2-wrap">
+    <div class="index2-grid">
+      <section class="card card-form">
+        <div class="form-block">
+          <h2 class="section-title">Ativo em triagem</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label for="tituloDeal">Nome do ativo</label>
+              <input id="tituloDeal" type="text" placeholder="Ex.: Casa em Osasco - Caixa 2º leilão" />
+            </div>
+
+            <div class="field">
+              <label for="cidadeUf">Cidade / UF</label>
+              <input id="cidadeUf" type="text" placeholder="Ex.: Osasco / SP" />
+            </div>
+
+            <div class="field">
+              <label for="bairro">Micromercado</label>
+              <input id="bairro" type="text" placeholder="Ex.: Centro" />
+            </div>
+
+            <div class="field">
+              <label for="tipoImovel">Tipo do imóvel</label>
+              <select id="tipoImovel">
+                <option value="">Selecione...</option>
+                <option value="Apartamento">Apartamento</option>
+                <option value="casa">Casa</option>
+                <option value="terreno">Terreno</option>
+                <option value="comercial">Comercial</option>
+                <option value="rural">Rural</option>
+                <option value="outro">Outro</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="metragem">Área privativa / construída (m²)</label>
+              <input id="metragem" type="number" step="0.01" placeholder="0,00" />
+            </div>
+
+            <div class="field">
+  <label for="origemOportunidade">Origem do fluxo</label>
+  <select id="origemOportunidade">
+    <option value="">Selecione...</option>
+    <option value="Leilão judicial">Leilão judicial</option>
+    <option value="Leilão extrajudicial">Leilão extrajudicial</option>
+    <option value="Venda direta">Venda direta</option>
+    <option value="Venda online">Venda online</option>
+    <option value="Licitação aberta">Licitação aberta</option>
+    <option value="Particular">Particular</option>
+  </select>
+</div>
+
+            <div class="field">
+              <label for="matriculaNumero">Matrícula</label>
+              <input id="matriculaNumero" type="text" placeholder="Número da matrícula" />
+            </div>
+
+            <div class="field">
+              <label for="comarcaRegistro">Cartório / comarca</label>
+              <input id="comarcaRegistro" type="text" placeholder="Ex.: 2º CRI de Osasco" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-block">
+          <h2 class="section-title">Tese de entrada e desinvestimento</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label for="valorAquisicao2">Valor de aquisição R$</label>
+              <input id="valorAquisicao2" type="text" />
+            </div>
+
+            <div class="field">
+              <label for="valorVenda2">Valor de venda projetado R$</label>
+              <input id="valorVenda2" type="text" />
+            </div>
+
+            <div class="field">
+  <label for="tipoPagamento2">Tipo de pagamento</label>
+  <select id="tipoPagamento2">
+    <option value="À vista">À vista</option>
+    <option value="Financiado">Financiado</option>
+  </select>
+</div>
+
+            <div class="field">
+  <label for="estrategiaSaida">Estratégia de saída</label>
+  <select id="estrategiaSaida">
+    <option value="">Selecione...</option>
+    <option value="Revenda curta">Revenda curta</option>
+    <option value="Revenda média">Revenda média</option>
+    <option value="Revenda após regularização">Revenda após regularização</option>
+    <option value="Locação">Locação</option>
+    <option value="Hold">Hold</option>
+  </select>
+</div>
+
+            <div class="field">
+              <label for="prazoSaidaMeses">Janela de liquidez (meses)</label>
+              <input id="prazoSaidaMeses" type="number" step="1" value="12" />
+            </div>
+
+            <div class="field">
+              <label for="plano2">Pacote de assessoria</label>
+              <select id="plano2">
+                <option value="0">Selecione...</option>
+                <option value="2000">Classic - R$ 2.000,00</option>
+                <option value="5000">Gold - R$ 5.000,00</option>
+                <option value="7000">Exclusive - R$ 7.000,00</option>
+                <option value="10000">Prime - R$ 10.000,00</option>
+                <option value="25000">Private - R$ 25.000,00</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="percAssessoria2">Assessoria sobre aquisição (%)</label>
+              <input id="percAssessoria2" type="number" step="0.01" />
+            </div>
+
+            <div class="field">
+              <label for="valorAssessoria2">Valor assessoria R$</label>
+              <input id="valorAssessoria2" type="text" disabled />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-block">
+          <h2 class="section-title">Fricções de execução</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label for="documentacaoPerc2">Documentação / registro (%)</label>
+              <input id="documentacaoPerc2" type="number" step="0.01" />
+            </div>
+
+            <div class="field">
+              <label for="documentacao2">Documentação R$</label>
+              <input id="documentacao2" type="text" disabled />
+            </div>
+
+            <div class="field">
+              <label for="leiloeiroPerc2">Comissão leiloeiro (%)</label>
+              <input id="leiloeiroPerc2" type="number" step="0.01" />
+            </div>
+
+            <div class="field">
+              <label for="leiloeiro2">Leiloeiro R$</label>
+              <input id="leiloeiro2" type="text" disabled />
+            </div>
+
+            <div class="field">
+              <label for="corretorPerc2">Comissão corretor (%)</label>
+              <input id="corretorPerc2" type="number" step="0.01" />
+            </div>
+
+            <div class="field">
+              <label for="corretor2">Corretor R$</label>
+              <input id="corretor2" type="text" disabled />
+            </div>
+
+            <div class="field">
+              <label for="dividas2">Dívidas / passivos R$</label>
+              <input id="dividas2" type="text" />
+            </div>
+
+            <div class="field">
+              <label for="reforma2">Reforma R$</label>
+              <input id="reforma2" type="text" />
+            </div>
+
+            <div class="field">
+              <label for="honorarios2">Honorários advocatícios R$</label>
+              <input id="honorarios2" type="text" />
+            </div>
+
+            <div class="field">
+              <label for="condMensal2">Condomínio mensal R$</label>
+              <input id="condMensal2" type="text" />
+            </div>
+
+            <div class="field">
+              <label for="iptuMensal2">IPTU mensal R$</label>
+              <input id="iptuMensal2" type="text" />
+            </div>
+
+            <div class="field">
+              <label for="custoObraPrazo">Prazo de obra (meses)</label>
+              <input id="custoObraPrazo" type="number" step="1" value="0" />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-block">
+          <h2 class="section-title">Estrutura de capital</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label for="entradaPerc2">Entrada (%)</label>
+              <input id="entradaPerc2" type="number" step="0.01" />
+            </div>
+
+            <div class="field">
+              <label for="entradaValor2">Entrada R$</label>
+              <input id="entradaValor2" type="text" disabled />
+            </div>
+
+            <div class="field">
+              <label for="jurosAnual2">Taxa de juros anual (%)</label>
+              <input id="jurosAnual2" type="number" step="0.01" />
+            </div>
+
+            <div class="field">
+              <label for="prazoFinanciamento2">Prazo financiamento (meses)</label>
+              <input id="prazoFinanciamento2" type="number" step="1" />
+            </div>
+
+            <div class="field">
+              <label for="sistema2">Sistema</label>
+              <select id="sistema2">
+                <option value="SAC">SAC</option>
+                <option value="PRICE">PRICE</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="valorFinanciado2">Valor financiado</label>
+              <input id="valorFinanciado2" type="text" disabled />
+            </div>
+
+            <div class="field">
+              <label for="parcelaEstimativa2">Parcela estimada</label>
+              <input id="parcelaEstimativa2" type="text" disabled />
+            </div>
+
+            <div class="field">
+              <label for="totalPagoAteSaida2">Total pago até a saída</label>
+              <input id="totalPagoAteSaida2" type="text" disabled />
+            </div>
+          </div>
+        </div>
+
+        <div class="form-block">
+          <h2 class="section-title">Camada jurídica do filtro</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label for="ocupado">Imóvel ocupado?</label>
+              <select id="ocupado">
+                <option value="">Selecione...</option>
+                <option value="nao">Não</option>
+                <option value="sim">Sim</option>
+                <option value="nao-sabemos">Não sabemos</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="quemOcupa">Quem ocupa?</label>
+              <select id="quemOcupa">
+                <option value="">Selecione...</option>
+                <option value="ex-proprietario">Ex-proprietário</option>
+                <option value="inquilino">Inquilino</option>
+                <option value="terceiro">Terceiro</option>
+                <option value="vago">Vago</option>
+                <option value="nao-sabemos">Não sabemos</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="matriculaLimpa">Matrícula limpa?</label>
+              <select id="matriculaLimpa">
+                <option value="">Selecione...</option>
+                <option value="sim">Sim</option>
+                <option value="nao">Não</option>
+                <option value="pendente">Pendente de análise</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="onusReais">Ônus relevantes?</label>
+              <select id="onusReais">
+                <option value="">Selecione...</option>
+                <option value="nao">Não</option>
+                <option value="sim">Sim</option>
+                <option value="nao-sabemos">Não sabemos</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="editalOk">Edital sem inconsistências?</label>
+              <select id="editalOk">
+                <option value="">Selecione...</option>
+                <option value="sim">Sim</option>
+                <option value="nao">Não</option>
+                <option value="pendente">Pendente</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="necessitaImissao">Necessita imissão / desocupação?</label>
+              <select id="necessitaImissao">
+                <option value="">Selecione...</option>
+                <option value="nao">Não</option>
+                <option value="sim">Sim</option>
+                <option value="provavel">Provável</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="haProcessos">Existem processos relevantes?</label>
+              <select id="haProcessos">
+                <option value="">Selecione...</option>
+                <option value="nao">Não</option>
+                <option value="sim">Sim</option>
+                <option value="pendente">Pendente</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="complexidadeJuridica">Complexidade jurídica</label>
+              <select id="complexidadeJuridica">
+                <option value="">Selecione...</option>
+                <option value="baixa">Baixa</option>
+                <option value="media">Média</option>
+                <option value="alta">Alta</option>
+              </select>
+            </div>
+
+            <div class="field field-span-2">
+              <label for="resumoJuridico">Síntese jurídica</label>
+              <textarea id="resumoJuridico" rows="4" placeholder="Descreva matrícula, edital, ações, ocupação, riscos e providências."></textarea>
+            </div>
+
+            <div class="field field-span-2">
+              <label for="numerosProcessos">Números de processos / observações</label>
+              <textarea id="numerosProcessos" rows="3" placeholder="Liste processos, ação possessória, usucapião, execução, etc."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-block">
+          <h2 class="section-title">Liquidez e premissas de mercado</h2>
+          <div class="form-grid">
+            <div class="field">
+              <label for="valorMercado">Valor de mercado estimado R$</label>
+              <input id="valorMercado" type="text" />
+            </div>
+
+            
+            <div class="field">
+              <label for="liquidezRegiao">Liquidez da região</label>
+              <select id="liquidezRegiao">
+                <option value="">Selecione...</option>
+                <option value="alta">Alta</option>
+                <option value="media">Média</option>
+                <option value="baixa">Baixa</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="vacanciaRegiao">Vacância / giro</label>
+              <select id="vacanciaRegiao">
+                <option value="">Selecione...</option>
+                <option value="baixa">Baixa</option>
+                <option value="media">Média</option>
+                <option value="alta">Alta</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="riscoReforma">Risco de reforma</label>
+              <select id="riscoReforma">
+                <option value="">Selecione...</option>
+                <option value="baixo">Baixo</option>
+                <option value="medio">Médio</option>
+                <option value="alto">Alto</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="benchmarkCdi">CDI de referência (%)</label>
+              <input id="benchmarkCdi" type="number" step="0.01" value="12.00" />
+            </div>
+
+            <div class="field field-span-2">
+              <label for="teseInvestimento">Tese de alocação</label>
+              <textarea id="teseInvestimento" rows="4" placeholder="Ex.: arrematar, regularizar ocupação, reforma leve e revender em 12 meses."></textarea>
+            </div>
+
+            <div class="field field-span-2">
+              <label for="observacoesAnalista">Tese, riscos e condicionantes</label>
+              <textarea id="observacoesAnalista" rows="5" placeholder="Pontos críticos, tese, upside, red flags e condicionantes."></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="actions-row actions-row-2">
+          <button type="button" class="btn-secondary" id="btnLimparIndex2">Limpar triagem</button>
+          <button type="button" class="btn-primary" id="btnAbrirQuant2">Rodar Filtro ISI</button>
+        </div>
+      </section>
+
+      <aside class="card aside-2">
+        <h2 class="section-title">Elegibilidade para Rating</h2>
+
+        <div class="hero-resultado hero-resultado-2">
+          <div class="hero-status is-neutral" id="statusIndex2">Aguardando preenchimento</div>
+          <div class="hero-valor" id="scorePreenchimento">0%</div>
+          <div class="hero-subtitulo">Dados mínimos para triagem quantitativa</div>
+
+          <div class="hero-metrics">
+            <div class="hero-metric">
+              <span class="hero-metric-label">Retorno</span>
+              <strong class="hero-metric-value" id="checkFinanceiro">0/8</strong>
+            </div>
+
+            <div class="hero-metric">
+              <span class="hero-metric-label">Risco legal</span>
+              <strong class="hero-metric-value" id="checkJuridico">0/7</strong>
+            </div>
+          </div>
+        </div>
+
+        <div class="support-panel">
+          <h3 class="support-title">Gates do filtro</h3>
+          <ul class="support-list" id="checklistMinimo">
+            <li>Valor de aquisição.</li>
+            <li>Valor de venda projetado.</li>
+            <li>Tipo de pagamento.</li>
+            <li>Prazo de saída.</li>
+            <li>Matrícula e edital analisados.</li>
+            <li>Ocupação e risco processual.</li>
+            <li>Tese e observações do analista.</li>
+          </ul>
+        </div>
+
+        <div class="support-panel support-panel-gap">
+          <h3 class="support-title">Snapshot da tese</h3>
+
+          <div class="stat">
+            <span class="label">Nome do ativo</span>
+            <span class="value" id="resumoTituloDeal">—</span>
+          </div>
+
+          <div class="stat">
+            <span class="label">Cidade / UF</span>
+            <span class="value" id="resumoCidadeUf">—</span>
+          </div>
+
+          <div class="stat">
+            <span class="label">Entrada</span>
+            <span class="value money" id="resumoAquisicao2">R$ 0,00</span>
+          </div>
+
+          <div class="stat">
+            <span class="label">Saída</span>
+            <span class="value money" id="resumoVenda2">R$ 0,00</span>
+          </div>
+
+          <div class="stat">
+            <span class="label">Fricções + passivos</span>
+            <span class="value money" id="resumoPassivo2">R$ 0,00</span>
+          </div>
+
+          <div class="stat">
+            <span class="label">Tese</span>
+            <span class="value" id="resumoEstrategia2">—</span>
+          </div>
+        </div>
+
+        <div class="support-panel support-panel-gap">
+          <h3 class="support-title">Leitura preliminar</h3>
+          <ul class="support-list" id="insightsIndex2">
+            <li>Preencha o formulário para habilitar a Quant 2.0.</li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <script>
+    const STORAGE_KEY_QUANT_V2 = "itaocaQuantPayloadV2";
+
+    function parseCurrency(raw){
+      if(raw === undefined || raw === null) return 0;
+      if(typeof raw === "number") return raw;
+
+      raw = String(raw).trim();
+      if(raw === "") return 0;
+
+      raw = raw.replace(/\s/g, "").replace(/^R\$/i, "");
+
+      if(raw.indexOf(",") > -1 && raw.indexOf(".") > -1){
+        raw = raw.replace(/\./g, "").replace(",", ";");
+      }
+
+      raw = raw.replace(",", ".").replace(";", ".");
+      const n = parseFloat(raw);
+      return isNaN(n) ? 0 : n;
+    }
+
+    function fmtBRL(v){
+      return Number(v || 0).toLocaleString("pt-BR", {
+        style: "currency",
+        currency: "BRL"
+      });
+    }
+
+    function fmtNumberInput(v){
+      return Number(v || 0).toLocaleString("pt-BR", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      });
+    }
+
+    function setText(id, value){
+      const el = document.getElementById(id);
+      if(el) el.textContent = value;
+    }
+
+    function attachCurrencyFormatting(ids){
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if(!el) return;
+
+        el.addEventListener("focus", function(){
+          const n = parseCurrency(this.value);
+          this.value = n ? n.toFixed(2).replace(".", ",") : "";
+        });
+
+        el.addEventListener("blur", function(){
+          const n = parseCurrency(this.value);
+          this.value = n ? fmtNumberInput(n) : "";
+          handleTipoPagamentoChangeIndex2();
+        });
+      });
+    }
+
+    function atualizarPercentuais(){
+      const valorAquisicao = parseCurrency(document.getElementById("valorAquisicao2").value);
+      const valorVenda = parseCurrency(document.getElementById("valorVenda2").value);
+
+      const percAssessoria = parseFloat(document.getElementById("percAssessoria2").value || 0) / 100;
+      const documentacaoPerc = parseFloat(document.getElementById("documentacaoPerc2").value || 0) / 100;
+      const leiloeiroPerc = parseFloat(document.getElementById("leiloeiroPerc2").value || 0) / 100;
+      const corretorPerc = parseFloat(document.getElementById("corretorPerc2").value || 0) / 100;
+      const entradaPerc = parseFloat(document.getElementById("entradaPerc2").value || 0) / 100;
+
+      const valorAssessoria = valorAquisicao * percAssessoria;
+      const documentacao = valorAquisicao * documentacaoPerc;
+      const leiloeiro = valorAquisicao * leiloeiroPerc;
+      const corretor = valorVenda * corretorPerc;
+      const entradaValor = valorAquisicao * entradaPerc;
+
+      document.getElementById("valorAssessoria2").value = valorAssessoria ? fmtBRL(valorAssessoria) : "";
+      document.getElementById("documentacao2").value = documentacao ? fmtBRL(documentacao) : "";
+      document.getElementById("leiloeiro2").value = leiloeiro ? fmtBRL(leiloeiro) : "";
+      document.getElementById("corretor2").value = corretor ? fmtBRL(corretor) : "";
+      document.getElementById("entradaValor2").value = entradaValor ? fmtBRL(entradaValor) : "";
+
+      atualizarFinanciamento();
+    }
+
+    function calcFinDetalhado(valorFin, taxaAnual, prazoTotal, mesesConsiderados, sistema){
+      const i = (taxaAnual / 100) / 12;
+      let jurosAcum = 0;
+      let principalPago = 0;
+      let parcela = 0;
+      let saldo = valorFin;
+
+      if(prazoTotal <= 0 || valorFin <= 0){
+        return { jurosAcum: 0, principalPago: 0, parcela: 0, saldoDevedor: valorFin };
+      }
+
+      if(sistema === "PRICE"){
+        if(i === 0){
+          parcela = valorFin / prazoTotal;
+        } else {
+          parcela = valorFin * (i * Math.pow(1 + i, prazoTotal)) / (Math.pow(1 + i, prazoTotal) - 1);
+        }
+
+        const meses = Math.min(mesesConsiderados, prazoTotal);
+
+        for(let m = 1; m <= meses; m++){
+          const jurosMes = saldo * i;
+          const amort = parcela - jurosMes;
+          const amortReal = Math.max(0, amort);
+
+          jurosAcum += jurosMes;
+          principalPago += amortReal;
+          saldo = Math.max(0, saldo - amortReal);
+        }
+
+        return { jurosAcum, principalPago, parcela, saldoDevedor: saldo };
+      }
+
+      const amort = valorFin / prazoTotal;
+      let primeiraParcela = 0;
+      const meses = Math.min(mesesConsiderados, prazoTotal);
+
+      for(let m = 1; m <= meses; m++){
+        const jurosMes = saldo * i;
+        const parcelaMes = amort + jurosMes;
+
+        if(m === 1) primeiraParcela = parcelaMes;
+
+        jurosAcum += jurosMes;
+        principalPago += amort;
+        saldo = Math.max(0, saldo - amort);
+      }
+
+      return { jurosAcum, principalPago, parcela: primeiraParcela, saldoDevedor: saldo };
+    }
+
+function normalizarTipoPagamento(valor) {
+  const v = String(valor || "").trim().toLowerCase();
+
+  if (v === "financiado") return "financiado";
+  if (v === "à vista" || v === "a vista" || v === "avista") return "avista";
+
+  return "avista";
+}
+
+
+    function atualizarFinanciamento() {
+  const tipo = normalizarTipoPagamento(document.getElementById("tipoPagamento2").value);
+  const valorAquisicao = parseCurrency(document.getElementById("valorAquisicao2").value);
+  const entradaValor = parseCurrency(document.getElementById("entradaValor2").value);
+  const jurosAnual = parseFloat(document.getElementById("jurosAnual2").value || 0);
+  const prazoFin = Math.max(0, parseInt(document.getElementById("prazoFinanciamento2").value || 0, 10));
+  const sistema = document.getElementById("sistema2").value || "SAC";
+  const prazoSaida = Math.max(0, parseInt(document.getElementById("prazoSaidaMeses").value || 12, 10));
+
+  if (tipo !== "financiado") {
+    document.getElementById("valorFinanciado2").value = "";
+    document.getElementById("parcelaEstimativa2").value = "";
+    document.getElementById("totalPagoAteSaida2").value = "";
+    return;
+  }
+
+  const valorFinanciado = Math.max(0, valorAquisicao - entradaValor);
+  const fin = calcFinDetalhado(valorFinanciado, jurosAnual, prazoFin, prazoSaida, sistema);
+
+  document.getElementById("valorFinanciado2").value = valorFinanciado ? fmtBRL(valorFinanciado) : "";
+  document.getElementById("parcelaEstimativa2").value = fin.parcela ? fmtBRL(fin.parcela) : "";
+  document.getElementById("totalPagoAteSaida2").value = (fin.jurosAcum + fin.principalPago) ? fmtBRL(fin.jurosAcum + fin.principalPago) : "";
+}
+
+
+
+    function setFinancingBlockIndex2(disabled){
+      const ids = ["entradaPerc2", "jurosAnual2", "prazoFinanciamento2", "sistema2"];
+      ids.forEach(function(id){
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.disabled = !!disabled;
+        const field = el.closest('.field');
+        if(field) field.classList.toggle('field-disabled', !!disabled);
+        if(disabled){
+          if(el.tagName === 'SELECT') {
+            if(id === 'sistema2') el.value = 'SAC';
+          } else {
+            el.value = '';
+          }
+        }
+      });
+    }
+
+    
+	function handleTipoPagamentoChangeIndex2(){
+  const tipo = normalizarTipoPagamento(document.getElementById("tipoPagamento2")?.value);
+
+  if(tipo === "avista"){
+    setFinancingBlockIndex2(true);
+  } else {
+    setFinancingBlockIndex2(false);
+    const sistemaEl = document.getElementById("sistema2");
+    if(sistemaEl && !sistemaEl.value) sistemaEl.value = "SAC";
+  }
+
+  atualizarFinanciamento();
+  atualizarPainel();
+}
+
+	
+	
+    function campoPreenchido(id){
+      const el = document.getElementById(id);
+      if(!el) return false;
+      return String(el.value || "").trim() !== "";
+    }
+
+    function atualizarPainel(){
+      atualizarPercentuais();
+
+      const essenciaisFinanceiro = [
+        "valorAquisicao2", "valorVenda2", "tipoPagamento2", "prazoSaidaMeses",
+        "documentacaoPerc2", "leiloeiroPerc2", "corretorPerc2", "plano2"
+      ];
+
+      const essenciaisJuridico = [
+        "matriculaNumero", "editalOk", "ocupado", "matriculaLimpa",
+        "haProcessos", "complexidadeJuridica", "teseInvestimento"
+      ];
+
+      const financeFilled = essenciaisFinanceiro.filter(campoPreenchido).length;
+      const juridicoFilled = essenciaisJuridico.filter(campoPreenchido).length;
+      const total = essenciaisFinanceiro.length + essenciaisJuridico.length;
+      const done = financeFilled + juridicoFilled;
+      const perc = Math.round((done / total) * 100);
+
+      setText("scorePreenchimento", `${perc}%`);
+      setText("checkFinanceiro", `${financeFilled}/${essenciaisFinanceiro.length}`);
+      setText("checkJuridico", `${juridicoFilled}/${essenciaisJuridico.length}`);
+
+      const status = document.getElementById("statusIndex2");
+      status.classList.remove("is-neutral", "is-warning", "is-good");
+
+      if(perc >= 85){
+        status.classList.add("is-good");
+        status.textContent = "Pronto para rodar o ISI";
+      } else if(perc >= 50){
+        status.classList.add("is-warning");
+        status.textContent = "Pronto para pré-rating";
+      } else {
+        status.classList.add("is-neutral");
+        status.textContent = "Triagem incompleta";
+      }
+
+      setText("resumoTituloDeal", document.getElementById("tituloDeal").value || "—");
+      setText("resumoCidadeUf", document.getElementById("cidadeUf").value || "—");
+      setText("resumoAquisicao2", fmtBRL(parseCurrency(document.getElementById("valorAquisicao2").value)));
+      setText("resumoVenda2", fmtBRL(parseCurrency(document.getElementById("valorVenda2").value)));
+
+      const passivo =
+        parseCurrency(document.getElementById("dividas2").value) +
+        parseCurrency(document.getElementById("reforma2").value);
+
+      setText("resumoPassivo2", fmtBRL(passivo));
+      setText("resumoEstrategia2", document.getElementById("estrategiaSaida").value || "—");
+
+      const insights = [];
+      const valorAquisicao = parseCurrency(document.getElementById("valorAquisicao2").value);
+      const valorVenda = parseCurrency(document.getElementById("valorVenda2").value);
+
+      if(valorAquisicao > 0 && valorVenda > 0){
+        const spreadBruto = valorVenda - valorAquisicao;
+        insights.push(`Spread bruto entre compra e venda: ${fmtBRL(spreadBruto)}.`);
+      }
+
+      if(campoPreenchido("ocupado")){
+        insights.push(`Status de ocupação informado: ${document.getElementById("ocupado").value}.`);
+      }
+
+      if(campoPreenchido("complexidadeJuridica")){
+        insights.push(`Complexidade jurídica classificada como ${document.getElementById("complexidadeJuridica").value}.`);
+      }
+
+      if(!insights.length){
+        insights.push("Preencha os dados para rodar o filtro ISI.");
+      }
+
+      document.getElementById("insightsIndex2").innerHTML = insights.map(item => `<li>${item}</li>`).join("");
+    }
+
+    function coletarPayload() {
+  return {
+    meta: { origem: "index-2", versao: "2.0" },
+    deal: {
+      tituloDeal: document.getElementById("tituloDeal").value,
+      cidadeUf: document.getElementById("cidadeUf").value,
+      bairro: document.getElementById("bairro").value,
+      tipoImovel: document.getElementById("tipoImovel").value,
+      metragem: document.getElementById("metragem").value,
+      origemOportunidade: document.getElementById("origemOportunidade").value,
+      matriculaNumero: document.getElementById("matriculaNumero").value,
+      comarcaRegistro: document.getElementById("comarcaRegistro").value
+    },
+    operacao: {
+      valorAquisicao: document.getElementById("valorAquisicao2").value,
+      valorVenda: document.getElementById("valorVenda2").value,
+      tipoPagamento: document.getElementById("tipoPagamento2").value || "À vista",
+      estrategiaSaida: document.getElementById("estrategiaSaida").value,
+      prazoSaidaMeses: document.getElementById("prazoSaidaMeses").value || 12,
+      plano: document.getElementById("plano2").value || 0,
+      percAssessoria: document.getElementById("percAssessoria2").value || 0,
+      valorAssessoria: document.getElementById("valorAssessoria2").value,
+      documentacaoPerc: document.getElementById("documentacaoPerc2").value || 0,
+      documentacao: document.getElementById("documentacao2").value,
+      leiloeiroPerc: document.getElementById("leiloeiroPerc2").value || 0,
+      leiloeiro: document.getElementById("leiloeiro2").value,
+      corretorPerc: document.getElementById("corretorPerc2").value || 0,
+      corretor: document.getElementById("corretor2").value,
+      dividas: document.getElementById("dividas2").value,
+      reforma: document.getElementById("reforma2").value,
+      honorarios: document.getElementById("honorarios2").value,
+      condMensal: document.getElementById("condMensal2").value,
+      iptuMensal: document.getElementById("iptuMensal2").value,
+      custoObraPrazo: document.getElementById("custoObraPrazo").value || 0
+    },
+    financiamento: {
+      entradaPerc: document.getElementById("entradaPerc2").value || 0,
+      entradaValor: document.getElementById("entradaValor2").value,
+      jurosAnual: document.getElementById("jurosAnual2").value || 0,
+      prazoFinanciamento: document.getElementById("prazoFinanciamento2").value || 0,
+      sistema: document.getElementById("sistema2").value || "SAC",
+      valorFinanciado: document.getElementById("valorFinanciado2").value,
+      parcelaEstimativa: document.getElementById("parcelaEstimativa2").value,
+      totalPagoAteSaida: document.getElementById("totalPagoAteSaida2").value
+    },
+    juridico: {
+      ocupado: document.getElementById("ocupado").value,
+      quemOcupa: document.getElementById("quemOcupa").value,
+      matriculaLimpa: document.getElementById("matriculaLimpa").value,
+      onusReais: document.getElementById("onusReais").value,
+      editalOk: document.getElementById("editalOk").value,
+      necessitaImissao: document.getElementById("necessitaImissao").value,
+      haProcessos: document.getElementById("haProcessos").value,
+      complexidadeJuridica: document.getElementById("complexidadeJuridica").value,
+      resumoJuridico: document.getElementById("resumoJuridico").value,
+      numerosProcessos: document.getElementById("numerosProcessos").value
+    },
+    mercado: {
+      valorMercado: document.getElementById("valorMercado").value,
+      liquidezRegiao: document.getElementById("liquidezRegiao").value,
+      vacanciaRegiao: document.getElementById("vacanciaRegiao").value,
+      riscoReforma: document.getElementById("riscoReforma").value,
+      benchmarkCdi: document.getElementById("benchmarkCdi").value || 12.00,
+      teseInvestimento: document.getElementById("teseInvestimento").value,
+      observacoesAnalista: document.getElementById("observacoesAnalista").value
+    }
+  };
+}
+
+
+    function abrirQuant2(){
+      const payload = coletarPayload();
+      sessionStorage.setItem(STORAGE_KEY_QUANT_V2, JSON.stringify(payload));
+      window.open("quant-2.html", "_blank");
+    }
+
+    function limparIndex2(){
+      const ids = [
+        "tituloDeal","cidadeUf","bairro","tipoImovel","metragem","origemOportunidade","matriculaNumero","comarcaRegistro",
+        "valorAquisicao2","valorVenda2","tipoPagamento2","estrategiaSaida","prazoSaidaMeses","plano2","percAssessoria2","valorAssessoria2",
+        "documentacaoPerc2","documentacao2","leiloeiroPerc2","leiloeiro2","corretorPerc2","corretor2","dividas2","reforma2",
+        "honorarios2","condMensal2","iptuMensal2","custoObraPrazo","entradaPerc2","entradaValor2","jurosAnual2","prazoFinanciamento2",
+        "sistema2","valorFinanciado2","parcelaEstimativa2","totalPagoAteSaida2","ocupado","quemOcupa","matriculaLimpa","onusReais",
+        "editalOk","necessitaImissao","haProcessos","complexidadeJuridica","resumoJuridico","numerosProcessos","valorMercado","liquidezRegiao",
+		"vacanciaRegiao","riscoReforma","benchmarkCdi","teseInvestimento","observacoesAnalista"
+      ];
+
+      ids.forEach(id => {
+        const el = document.getElementById(id);
+        if(!el) return;
+
+        if(el.tagName === "SELECT"){
+          el.selectedIndex = 0;
+        } else {
+          el.value = "";
+        }
+      });
+
+      document.getElementById("tipoPagamento2").value = "À vista";
+      document.getElementById("prazoSaidaMeses").value = "12";
+      document.getElementById("custoObraPrazo").value = "0";
+      document.getElementById("sistema2").value = "SAC";
+      document.getElementById("benchmarkCdi").value = "12.00";
+
+      handleTipoPagamentoChangeIndex2();
+    }
+
+    document.addEventListener("DOMContentLoaded", function(){
+      attachCurrencyFormatting([
+        "valorAquisicao2","valorVenda2","dividas2","reforma2","honorarios2","condMensal2","iptuMensal2","valorMercado"
+      ]);
+
+      [
+        "valorAquisicao2","valorVenda2","tipoPagamento2","estrategiaSaida","prazoSaidaMeses","plano2","percAssessoria2",
+        "documentacaoPerc2","leiloeiroPerc2","corretorPerc2","dividas2","reforma2","honorarios2","condMensal2","iptuMensal2",
+        "custoObraPrazo","entradaPerc2","jurosAnual2","prazoFinanciamento2","sistema2","ocupado","quemOcupa","matriculaLimpa",
+        "onusReais","editalOk","necessitaImissao","haProcessos","complexidadeJuridica","valorMercado",
+        "liquidezRegiao","vacanciaRegiao","riscoReforma","benchmarkCdi","tituloDeal","cidadeUf","bairro","tipoImovel",
+        "metragem","origemOportunidade","matriculaNumero","comarcaRegistro","resumoJuridico","numerosProcessos",
+        "teseInvestimento","observacoesAnalista"
+      ].forEach(id => {
+        const el = document.getElementById(id);
+        if(!el) return;
+        el.addEventListener("input", atualizarPainel);
+        el.addEventListener("change", atualizarPainel);
+      });
+
+      document.getElementById("tipoPagamento2").addEventListener("change", handleTipoPagamentoChangeIndex2);
+      document.getElementById("btnAbrirQuant2").addEventListener("click", abrirQuant2);
+      document.getElementById("btnLimparIndex2").addEventListener("click", limparIndex2);
+
+      handleTipoPagamentoChangeIndex2();
+    });
+  </script>
+</body>
+</html>

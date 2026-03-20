@@ -1181,3 +1181,39 @@ select:hover {
     width: 100%;
   }
 }
+.top-switch {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 0 16px 0;
+}
+
+.top-switch .btn-secondary,
+.top-switch .btn-primary {
+  min-width: 180px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.top-switch .is-current {
+  background: rgba(27,58,60,0.06);
+  border-color: rgba(27,58,60,0.18);
+  pointer-events: none;
+  opacity: 0.95;
+}
+
+@media (max-width: 760px) {
+  .top-switch {
+    justify-content: stretch;
+  }
+
+  .top-switch .btn-secondary,
+  .top-switch .btn-primary {
+    width: 100%;
+    min-width: 0;
+  }
+}
