@@ -31,12 +31,50 @@ textarea {
   resize: vertical;
   min-height: 110px;
   font-family: "Montserrat", sans-serif;
+  box-sizing: border-box;
 }
 
 textarea:focus {
   border-color: var(--dourado-itaoca);
   box-shadow: 0 0 0 2px rgba(166,130,61,0.25);
   outline: none;
+}
+
+/* Novos campos: mesmo padrão visual dos inputs já existentes */
+.index2-wrap input[type="url"],
+.index2-wrap input[type="date"] {
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.12);
+  font-size: clamp(0.9rem, 0.86rem + 0.15vw, 0.95rem);
+  color: var(--verde-itaoca);
+  background: var(--branco);
+  transition: 0.2s;
+  box-sizing: border-box;
+  font-family: "Montserrat", sans-serif;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.index2-wrap input[type="url"]:hover,
+.index2-wrap input[type="date"]:hover {
+  border-color: rgba(166,130,61,0.45);
+}
+
+.index2-wrap input[type="url"]:focus,
+.index2-wrap input[type="date"]:focus {
+  border-color: var(--dourado-itaoca);
+  box-shadow: 0 0 0 2px rgba(166,130,61,0.25);
+  outline: none;
+}
+
+.index2-wrap input[type="url"]:disabled,
+.index2-wrap input[type="date"]:disabled {
+  background: #f8f8f8;
+  color: #556;
 }
 
 .hero-resultado-2 {
