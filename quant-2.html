@@ -786,22 +786,30 @@ function calcularFiscal(payload, operacional, valorVendaAtual = null) {
     }
 
     function scoreRetorno(operacional, fiscal){
-      let score = 0;
+  if (
+    operacional.valorAquisicao <= 0 &&
+    operacional.valorVenda <= 0 &&
+    operacional.desembolso <= 0
+  ) return 0;
 
-      if(fiscal.roiPosIR >= 30) score += 35;
-      else if(fiscal.roiPosIR >= 20) score += 28;
-      else if(fiscal.roiPosIR >= 12) score += 20;
-      else if(fiscal.roiPosIR >= 5) score += 12;
-      else if(fiscal.roiPosIR >= 0) score += 6;
+  let score = 0;
 
-      if(operacional.folgaSobreMinimo > 0){
-        const rel = operacional.valorVenda > 0 ? operacional.folgaSobreMinimo / operacional.valorVenda : 0;
-        score += clamp(rel * 100, 0, 12);
-      }
+  if (fiscal.roiPosIR >= 30) score += 28;
+  else if (fiscal.roiPosIR >= 20) score += 23;
+  else if (fiscal.roiPosIR >= 12) score += 16;
+  else if (fiscal.roiPosIR >= 5) score += 9;
+  else if (fiscal.roiPosIR > 0) score += 4;
 
-      return Math.round(clamp(score, 0, 40));
-    }
+  if (operacional.folgaSobreMinimo > 0 && operacional.valorVenda > 0) {
+    const rel = operacional.folgaSobreMinimo / operacional.valorVenda;
+    score += clamp(rel * 100, 0, 7);
+  }
 
+  return Math.round(clamp(score, 0, 35));
+}
+
+	
+	
     function scoreJuridico(payload){
       const j = payload.juridico || {};
       let score = 0;
@@ -855,27 +863,28 @@ function calcularFiscal(payload, operacional, valorVendaAtual = null) {
     }
 
     function scoreExecucao(payload){
-      const m = payload.mercado || {};
-      const prazoSaida = Math.max(0, parseInt(get(payload, "operacao.prazoSaidaMeses", 12), 10) || 12);
-      const prazoObra = Math.max(0, parseInt(get(payload, "operacao.custoObraPrazo", 0), 10) || 0);
+  const prazoRaw = get(payload, 'operacao.prazoSaidaMeses', '');
+  const riscoReforma = get(payload, 'mercado.riscoReforma', '');
 
-      let score = 0;
+  if (!String(prazoRaw).trim() && !String(riscoReforma).trim()) {
+    return 0;
+  }
 
-      if(m.riscoReforma === "baixo") score += 7;
-      else if(m.riscoReforma === "medio") score += 4;
-      else if(m.riscoReforma === "alto") score += 1;
-      else score += 3;
+  const m = payload.mercado || {};
+  const prazoSaida = Math.max(0, parseInt(prazoRaw || 0, 10) || 0);
+  let score = 0;
 
-      if(prazoSaida <= 12) score += 5;
-      else if(prazoSaida <= 18) score += 3;
-      else score += 1;
+  if (m.riscoReforma === 'baixo') score += 7;
+  else if (m.riscoReforma === 'medio') score += 4;
+  else if (m.riscoReforma === 'alto') score += 1;
 
-      if(prazoObra <= 3) score += 5;
-      else if(prazoObra <= 6) score += 3;
-      else score += 1;
+  if (prazoSaida > 0 && prazoSaida <= 12) score += 5;
+  else if (prazoSaida > 0 && prazoSaida <= 18) score += 3;
+  else if (prazoSaida > 18) score += 1;
 
-      return Math.round(clamp(score, 0, 15));
-    }
+  return Math.round(clamp(score, 0, 15));
+}
+
 
     function gerarVeredito(payload, operacional, fiscal, breakdown){
       const scoreTotal = clamp(
