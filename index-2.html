@@ -45,6 +45,22 @@
   <main class="wrap index2-wrap">
     <div class="index2-grid">
       <section class="card card-form">
+	  
+		<!-- NOVO BLOCO: acima de "Identificação do deal" -->
+<div class="form-block">
+  <h2 class="section-title">Controle da análise</h2>
+  <div class="form-grid">
+    <div class="field">
+      <label for="dataAnalise">Data da análise</label>
+      <input id="dataAnalise" type="date">
+    </div>
+    <div class="field">
+      <label for="analistaResponsavel">Analista responsável</label>
+      <input id="analistaResponsavel" type="text" placeholder="Ex. Tatiana, Teresa, Kesler">
+    </div>
+  </div>
+</div>
+
         <div class="form-block">
           <h2 class="section-title">Ativo em triagem</h2>
           <div class="form-grid">
@@ -103,6 +119,46 @@
               <label for="comarcaRegistro">Cartório / comarca</label>
               <input id="comarcaRegistro" type="text" placeholder="Ex.: 2º CRI de Osasco" />
             </div>
+			
+			<!-- INSERIR em "Identificação do deal", logo após Cartório / comarca -->
+<div class="field">
+  <label for="linkMatricula">Link da matrícula</label>
+  <input id="linkMatricula" type="url" placeholder="https://...">
+</div>
+
+<div class="field">
+  <label for="linkEdital">Link do edital</label>
+  <input id="linkEdital" type="url" placeholder="https://...">
+</div>
+
+<div class="field">
+  <label for="tipoPrazoEdital">Tipo do prazo do edital</label>
+  <select id="tipoPrazoEdital">
+    <option value="">Selecione...</option>
+	<option value="primeira-praca">1ª praça</option>
+    <option value="segunda-praca">2ª praça</option>
+    <option value="licitacao-final">Data final da licitação</option>
+    <option value="venda-online-final">Data final da venda online</option>
+    <option value="proposta-final">Prazo final de proposta</option>
+    <option value="outro">Outro</option>
+  </select>
+</div>
+
+<div class="field">
+  <label for="dataPrazoEdital">Data limite do edital / proposta</label>
+  <input id="dataPrazoEdital" type="date">
+</div>
+
+<div class="field">
+  <label for="lanceMinimoEdital">Lance mínimo R$</label>
+  <input id="lanceMinimoEdital" type="text">
+</div>
+
+<div class="field">
+  <label for="valorAvaliacaoEdital">Avaliação do imóvel no edital R$</label>
+  <input id="valorAvaliacaoEdital" type="text">
+</div>
+
           </div>
         </div>
 
@@ -418,6 +474,21 @@
               <label for="observacoesAnalista">Tese de alocação, riscos e condicionantes</label>
               <textarea id="observacoesAnalista" rows="5" placeholder="Pontos críticos, tese, upside, red flags e condicionantes."></textarea>
             </div>
+<div class="field field-span-2">
+  <label for="linkComparaveis1">Fonte de mercado 01</label>
+  <input id="linkComparaveis1" type="url" placeholder="https://...">
+</div>
+
+<div class="field field-span-2">
+  <label for="linkComparaveis2">Fonte de mercado 02</label>
+  <input id="linkComparaveis2" type="url" placeholder="https://...">
+</div>
+
+<div class="field field-span-2">
+  <label for="linkComparaveis3">Fonte de mercado 03</label>
+  <input id="linkComparaveis3" type="url" placeholder="https://...">
+</div>
+
           </div>
         </div>
 
@@ -506,251 +577,269 @@
   </main>
 
   <script>
-    const STORAGE_KEY_QUANT_V2 = "itaocaQuantPayloadV2";
+  const STORAGE_KEY_QUANT_V2 = "itaocaQuantPayloadV2";
 
-    function parseCurrency(raw){
-      if(raw === undefined || raw === null) return 0;
-      if(typeof raw === "number") return raw;
+  function getEl(id){
+    return document.getElementById(id);
+  }
 
-      raw = String(raw).trim();
-      if(raw === "") return 0;
+  function getValue(id, fallback = ""){
+    const el = getEl(id);
+    return el ? el.value : fallback;
+  }
 
-      raw = raw.replace(/\s/g, "").replace(/^R\$/i, "");
+  function setValue(id, value){
+    const el = getEl(id);
+    if(el) el.value = value;
+  }
 
-      if(raw.indexOf(",") > -1 && raw.indexOf(".") > -1){
-        raw = raw.replace(/\./g, "").replace(",", ";");
+  function parseCurrency(raw){
+    if(raw === undefined || raw === null) return 0;
+    if(typeof raw === "number") return raw;
+
+    raw = String(raw).trim();
+    if(raw === "") return 0;
+
+    raw = raw.replace(/\s/g, "").replace(/^R\$/i, "");
+
+    if(raw.indexOf(",") > -1 && raw.indexOf(".") > -1){
+      raw = raw.replace(/\./g, "").replace(",", ";");
+    }
+
+    raw = raw.replace(",", ".").replace(";", ".");
+    const n = parseFloat(raw);
+    return isNaN(n) ? 0 : n;
+  }
+
+  function fmtBRL(v){
+    return Number(v || 0).toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    });
+  }
+
+  function fmtNumberInput(v){
+    return Number(v || 0).toLocaleString("pt-BR", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+  }
+
+  function setText(id, value){
+    const el = getEl(id);
+    if(el) el.textContent = value;
+  }
+
+  function hojeISO(){
+    const agora = new Date();
+    const ano = agora.getFullYear();
+    const mes = String(agora.getMonth() + 1).padStart(2, "0");
+    const dia = String(agora.getDate()).padStart(2, "0");
+    return `${ano}-${mes}-${dia}`;
+  }
+
+  function attachCurrencyFormatting(ids){
+    ids.forEach(id => {
+      const el = getEl(id);
+      if(!el) return;
+
+      el.addEventListener("focus", function(){
+        const n = parseCurrency(this.value);
+        this.value = n ? n.toFixed(2).replace(".", ",") : "";
+      });
+
+      el.addEventListener("blur", function(){
+        const n = parseCurrency(this.value);
+        this.value = n ? fmtNumberInput(n) : "";
+        handleTipoPagamentoChangeIndex2();
+      });
+    });
+  }
+
+  function atualizarPercentuais(){
+    const valorAquisicao = parseCurrency(getValue("valorAquisicao2"));
+    const valorVenda = parseCurrency(getValue("valorVenda2"));
+
+    const percAssessoria = parseFloat(getValue("percAssessoria2") || 0) / 100;
+    const documentacaoPerc = parseFloat(getValue("documentacaoPerc2") || 0) / 100;
+    const leiloeiroPerc = parseFloat(getValue("leiloeiroPerc2") || 0) / 100;
+    const corretorPerc = parseFloat(getValue("corretorPerc2") || 0) / 100;
+    const entradaPerc = parseFloat(getValue("entradaPerc2") || 0) / 100;
+
+    const valorAssessoria = valorAquisicao * percAssessoria;
+    const documentacao = valorAquisicao * documentacaoPerc;
+    const leiloeiro = valorAquisicao * leiloeiroPerc;
+    const corretor = valorVenda * corretorPerc;
+    const entradaValor = valorAquisicao * entradaPerc;
+
+    setValue("valorAssessoria2", valorAssessoria ? fmtBRL(valorAssessoria) : "");
+    setValue("documentacao2", documentacao ? fmtBRL(documentacao) : "");
+    setValue("leiloeiro2", leiloeiro ? fmtBRL(leiloeiro) : "");
+    setValue("corretor2", corretor ? fmtBRL(corretor) : "");
+    setValue("entradaValor2", entradaValor ? fmtBRL(entradaValor) : "");
+
+    atualizarFinanciamento();
+  }
+
+  function calcFinDetalhado(valorFin, taxaAnual, prazoTotal, mesesConsiderados, sistema){
+    const i = (taxaAnual / 100) / 12;
+    let jurosAcum = 0;
+    let principalPago = 0;
+    let parcela = 0;
+    let saldo = valorFin;
+
+    if(prazoTotal <= 0 || valorFin <= 0){
+      return { jurosAcum: 0, principalPago: 0, parcela: 0, saldoDevedor: valorFin };
+    }
+
+    if(sistema === "PRICE"){
+      if(i === 0){
+        parcela = valorFin / prazoTotal;
+      } else {
+        parcela = valorFin * (i * Math.pow(1 + i, prazoTotal)) / (Math.pow(1 + i, prazoTotal) - 1);
       }
 
-      raw = raw.replace(",", ".").replace(";", ".");
-      const n = parseFloat(raw);
-      return isNaN(n) ? 0 : n;
-    }
-
-    function fmtBRL(v){
-      return Number(v || 0).toLocaleString("pt-BR", {
-        style: "currency",
-        currency: "BRL"
-      });
-    }
-
-    function fmtNumberInput(v){
-      return Number(v || 0).toLocaleString("pt-BR", {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2
-      });
-    }
-
-    function setText(id, value){
-      const el = document.getElementById(id);
-      if(el) el.textContent = value;
-    }
-
-    function attachCurrencyFormatting(ids){
-      ids.forEach(id => {
-        const el = document.getElementById(id);
-        if(!el) return;
-
-        el.addEventListener("focus", function(){
-          const n = parseCurrency(this.value);
-          this.value = n ? n.toFixed(2).replace(".", ",") : "";
-        });
-
-        el.addEventListener("blur", function(){
-          const n = parseCurrency(this.value);
-          this.value = n ? fmtNumberInput(n) : "";
-          handleTipoPagamentoChangeIndex2();
-        });
-      });
-    }
-
-    function atualizarPercentuais(){
-      const valorAquisicao = parseCurrency(document.getElementById("valorAquisicao2").value);
-      const valorVenda = parseCurrency(document.getElementById("valorVenda2").value);
-
-      const percAssessoria = parseFloat(document.getElementById("percAssessoria2").value || 0) / 100;
-      const documentacaoPerc = parseFloat(document.getElementById("documentacaoPerc2").value || 0) / 100;
-      const leiloeiroPerc = parseFloat(document.getElementById("leiloeiroPerc2").value || 0) / 100;
-      const corretorPerc = parseFloat(document.getElementById("corretorPerc2").value || 0) / 100;
-      const entradaPerc = parseFloat(document.getElementById("entradaPerc2").value || 0) / 100;
-
-      const valorAssessoria = valorAquisicao * percAssessoria;
-      const documentacao = valorAquisicao * documentacaoPerc;
-      const leiloeiro = valorAquisicao * leiloeiroPerc;
-      const corretor = valorVenda * corretorPerc;
-      const entradaValor = valorAquisicao * entradaPerc;
-
-      document.getElementById("valorAssessoria2").value = valorAssessoria ? fmtBRL(valorAssessoria) : "";
-      document.getElementById("documentacao2").value = documentacao ? fmtBRL(documentacao) : "";
-      document.getElementById("leiloeiro2").value = leiloeiro ? fmtBRL(leiloeiro) : "";
-      document.getElementById("corretor2").value = corretor ? fmtBRL(corretor) : "";
-      document.getElementById("entradaValor2").value = entradaValor ? fmtBRL(entradaValor) : "";
-
-      atualizarFinanciamento();
-    }
-
-    function calcFinDetalhado(valorFin, taxaAnual, prazoTotal, mesesConsiderados, sistema){
-      const i = (taxaAnual / 100) / 12;
-      let jurosAcum = 0;
-      let principalPago = 0;
-      let parcela = 0;
-      let saldo = valorFin;
-
-      if(prazoTotal <= 0 || valorFin <= 0){
-        return { jurosAcum: 0, principalPago: 0, parcela: 0, saldoDevedor: valorFin };
-      }
-
-      if(sistema === "PRICE"){
-        if(i === 0){
-          parcela = valorFin / prazoTotal;
-        } else {
-          parcela = valorFin * (i * Math.pow(1 + i, prazoTotal)) / (Math.pow(1 + i, prazoTotal) - 1);
-        }
-
-        const meses = Math.min(mesesConsiderados, prazoTotal);
-
-        for(let m = 1; m <= meses; m++){
-          const jurosMes = saldo * i;
-          const amort = parcela - jurosMes;
-          const amortReal = Math.max(0, amort);
-
-          jurosAcum += jurosMes;
-          principalPago += amortReal;
-          saldo = Math.max(0, saldo - amortReal);
-        }
-
-        return { jurosAcum, principalPago, parcela, saldoDevedor: saldo };
-      }
-
-      const amort = valorFin / prazoTotal;
-      let primeiraParcela = 0;
       const meses = Math.min(mesesConsiderados, prazoTotal);
 
       for(let m = 1; m <= meses; m++){
         const jurosMes = saldo * i;
-        const parcelaMes = amort + jurosMes;
-
-        if(m === 1) primeiraParcela = parcelaMes;
+        const amort = parcela - jurosMes;
+        const amortReal = Math.max(0, amort);
 
         jurosAcum += jurosMes;
-        principalPago += amort;
-        saldo = Math.max(0, saldo - amort);
+        principalPago += amortReal;
+        saldo = Math.max(0, saldo - amortReal);
       }
 
-      return { jurosAcum, principalPago, parcela: primeiraParcela, saldoDevedor: saldo };
+      return { jurosAcum, principalPago, parcela, saldoDevedor: saldo };
     }
 
-function normalizarTipoPagamento(valor) {
-  const v = String(valor || "").trim().toLowerCase();
+    const amort = valorFin / prazoTotal;
+    let primeiraParcela = 0;
+    const meses = Math.min(mesesConsiderados, prazoTotal);
 
-  if (v === "financiado") return "financiado";
-  if (v === "à vista" || v === "a vista" || v === "avista") return "avista";
+    for(let m = 1; m <= meses; m++){
+      const jurosMes = saldo * i;
+      const parcelaMes = amort + jurosMes;
 
-  return "avista";
-}
+      if(m === 1) primeiraParcela = parcelaMes;
 
+      jurosAcum += jurosMes;
+      principalPago += amort;
+      saldo = Math.max(0, saldo - amort);
+    }
 
-    function atualizarFinanciamento() {
-  const tipo = normalizarTipoPagamento(document.getElementById("tipoPagamento2").value);
-  const valorAquisicao = parseCurrency(document.getElementById("valorAquisicao2").value);
-  const entradaValor = parseCurrency(document.getElementById("entradaValor2").value);
-  const jurosAnual = parseFloat(document.getElementById("jurosAnual2").value || 0);
-  const prazoFin = Math.max(0, parseInt(document.getElementById("prazoFinanciamento2").value || 0, 10));
-  const sistema = document.getElementById("sistema2").value || "SAC";
-  const prazoSaida = Math.max(0, parseInt(document.getElementById("prazoSaidaMeses").value || 12, 10));
-
-  if (tipo !== "financiado") {
-    document.getElementById("valorFinanciado2").value = "";
-    document.getElementById("parcelaEstimativa2").value = "";
-    document.getElementById("totalPagoAteSaida2").value = "";
-    return;
+    return { jurosAcum, principalPago, parcela: primeiraParcela, saldoDevedor: saldo };
   }
 
-  const valorFinanciado = Math.max(0, valorAquisicao - entradaValor);
-  const fin = calcFinDetalhado(valorFinanciado, jurosAnual, prazoFin, prazoSaida, sistema);
+  function normalizarTipoPagamento(valor){
+    const v = String(valor || "").trim().toLowerCase();
 
-  document.getElementById("valorFinanciado2").value = valorFinanciado ? fmtBRL(valorFinanciado) : "";
-  document.getElementById("parcelaEstimativa2").value = fin.parcela ? fmtBRL(fin.parcela) : "";
-  document.getElementById("totalPagoAteSaida2").value = (fin.jurosAcum + fin.principalPago) ? fmtBRL(fin.jurosAcum + fin.principalPago) : "";
-}
+    if(v === "financiado") return "financiado";
+    if(v === "à vista" || v === "a vista" || v === "avista") return "avista";
 
+    return "avista";
+  }
 
+  function atualizarFinanciamento(){
+    const tipo = normalizarTipoPagamento(getValue("tipoPagamento2"));
+    const valorAquisicao = parseCurrency(getValue("valorAquisicao2"));
+    const entradaValor = parseCurrency(getValue("entradaValor2"));
+    const jurosAnual = parseFloat(getValue("jurosAnual2") || 0);
+    const prazoFin = Math.max(0, parseInt(getValue("prazoFinanciamento2") || 0, 10));
+    const sistema = getValue("sistema2") || "SAC";
+    const prazoSaida = Math.max(0, parseInt(getValue("prazoSaidaMeses") || 12, 10));
 
-    function setFinancingBlockIndex2(disabled){
-      const ids = ["entradaPerc2", "jurosAnual2", "prazoFinanciamento2", "sistema2"];
-      ids.forEach(function(id){
-        const el = document.getElementById(id);
-        if(!el) return;
-        el.disabled = !!disabled;
-        const field = el.closest('.field');
-        if(field) field.classList.toggle('field-disabled', !!disabled);
-        if(disabled){
-          if(el.tagName === 'SELECT') {
-            if(id === 'sistema2') el.value = 'SAC';
-          } else {
-            el.value = '';
-          }
+    if(tipo !== "financiado"){
+      setValue("valorFinanciado2", "");
+      setValue("parcelaEstimativa2", "");
+      setValue("totalPagoAteSaida2", "");
+      return;
+    }
+
+    const valorFinanciado = Math.max(0, valorAquisicao - entradaValor);
+    const fin = calcFinDetalhado(valorFinanciado, jurosAnual, prazoFin, prazoSaida, sistema);
+
+    setValue("valorFinanciado2", valorFinanciado ? fmtBRL(valorFinanciado) : "");
+    setValue("parcelaEstimativa2", fin.parcela ? fmtBRL(fin.parcela) : "");
+    setValue("totalPagoAteSaida2", (fin.jurosAcum + fin.principalPago) ? fmtBRL(fin.jurosAcum + fin.principalPago) : "");
+  }
+
+  function setFinancingBlockIndex2(disabled){
+    const ids = ["entradaPerc2", "jurosAnual2", "prazoFinanciamento2", "sistema2"];
+
+    ids.forEach(function(id){
+      const el = getEl(id);
+      if(!el) return;
+
+      el.disabled = !!disabled;
+      const field = el.closest(".field");
+      if(field) field.classList.toggle("field-disabled", !!disabled);
+
+      if(disabled){
+        if(el.tagName === "SELECT"){
+          if(id === "sistema2") el.value = "SAC";
+        } else {
+          el.value = "";
         }
-      });
-    }
-
-    
-	function handleTipoPagamentoChangeIndex2(){
-  const tipo = normalizarTipoPagamento(document.getElementById("tipoPagamento2")?.value);
-
-  if(tipo === "avista"){
-    setFinancingBlockIndex2(true);
-  } else {
-    setFinancingBlockIndex2(false);
-    const sistemaEl = document.getElementById("sistema2");
-    if(sistemaEl && !sistemaEl.value) sistemaEl.value = "SAC";
+      }
+    });
   }
 
-  atualizarFinanciamento();
-  atualizarPainel();
-}
+  function handleTipoPagamentoChangeIndex2(){
+    const tipo = normalizarTipoPagamento(getValue("tipoPagamento2"));
 
-	
-	
-    function campoPreenchido(id){
-      const el = document.getElementById(id);
-      if(!el) return false;
-      return String(el.value || "").trim() !== "";
+    if(tipo === "avista"){
+      setFinancingBlockIndex2(true);
+    } else {
+      setFinancingBlockIndex2(false);
+      const sistemaEl = getEl("sistema2");
+      if(sistemaEl && !sistemaEl.value) sistemaEl.value = "SAC";
     }
 
-    function atualizarPainel(){
-      atualizarPercentuais();
+    atualizarFinanciamento();
+    atualizarPainel();
+  }
 
-      const essenciaisFinanceiro = [
-  'valorAquisicao2',
-  'valorVenda2',
-  'documentacaoPerc2',
-  'leiloeiroPerc2',
-  'prazoSaidaMeses',
-  'corretorPerc2'
-];
+  function campoPreenchido(id){
+    const el = getEl(id);
+    if(!el) return false;
+    return String(el.value || "").trim() !== "";
+  }
 
+  function atualizarPainel(){
+    atualizarPercentuais();
 
-      const essenciaisJuridico = [
-  'matriculaNumero',
-  'editalOk',
-  'ocupado',
-  'matriculaLimpa',
-  'haProcessos',
-  'complexidadeJuridica'
-];
+    const essenciaisFinanceiro = [
+      "valorAquisicao2",
+      "valorVenda2",
+      "documentacaoPerc2",
+      "leiloeiroPerc2",
+      "prazoSaidaMeses",
+      "corretorPerc2"
+    ];
 
+    const essenciaisJuridico = [
+      "matriculaNumero",
+      "editalOk",
+      "ocupado",
+      "matriculaLimpa",
+      "haProcessos",
+      "complexidadeJuridica"
+    ];
 
-      const financeFilled = essenciaisFinanceiro.filter(campoPreenchido).length;
-      const juridicoFilled = essenciaisJuridico.filter(campoPreenchido).length;
-      const total = essenciaisFinanceiro.length + essenciaisJuridico.length;
-      const done = financeFilled + juridicoFilled;
-      const perc = Math.round((done / total) * 100);
+    const financeFilled = essenciaisFinanceiro.filter(campoPreenchido).length;
+    const juridicoFilled = essenciaisJuridico.filter(campoPreenchido).length;
+    const total = essenciaisFinanceiro.length + essenciaisJuridico.length;
+    const done = financeFilled + juridicoFilled;
+    const perc = total ? Math.round((done / total) * 100) : 0;
 
-      setText("scorePreenchimento", `${perc}%`);
-      setText("checkFinanceiro", `${financeFilled}/${essenciaisFinanceiro.length}`);
-      setText("checkJuridico", `${juridicoFilled}/${essenciaisJuridico.length}`);
+    setText("scorePreenchimento", `${perc}%`);
+    setText("checkFinanceiro", `${financeFilled}/${essenciaisFinanceiro.length}`);
+    setText("checkJuridico", `${juridicoFilled}/${essenciaisJuridico.length}`);
 
-      const status = document.getElementById("statusIndex2");
+    const status = getEl("statusIndex2");
+    if(status){
       status.classList.remove("is-neutral", "is-warning", "is-good");
 
       if(perc >= 85){
@@ -763,170 +852,219 @@ function normalizarTipoPagamento(valor) {
         status.classList.add("is-neutral");
         status.textContent = "Triagem incompleta";
       }
-
-      setText("resumoTituloDeal", document.getElementById("tituloDeal").value || "—");
-      setText("resumoCidadeUf", document.getElementById("cidadeUf").value || "—");
-      setText("resumoAquisicao2", fmtBRL(parseCurrency(document.getElementById("valorAquisicao2").value)));
-      setText("resumoVenda2", fmtBRL(parseCurrency(document.getElementById("valorVenda2").value)));
-
-      const passivo =
-        parseCurrency(document.getElementById("dividas2").value) +
-        parseCurrency(document.getElementById("reforma2").value);
-
-      setText("resumoPassivo2", fmtBRL(passivo));
-      setText("resumoEstrategia2", document.getElementById("estrategiaSaida").value || "—");
-
-      const insights = [];
-      const valorAquisicao = parseCurrency(document.getElementById("valorAquisicao2").value);
-      const valorVenda = parseCurrency(document.getElementById("valorVenda2").value);
-
-      if(valorAquisicao > 0 && valorVenda > 0){
-        const spreadBruto = valorVenda - valorAquisicao;
-        insights.push(`Spread bruto entre compra e venda: ${fmtBRL(spreadBruto)}.`);
-      }
-
-      if(campoPreenchido("ocupado")){
-        insights.push(`Status de ocupação informado: ${document.getElementById("ocupado").value}.`);
-      }
-
-      if(campoPreenchido("complexidadeJuridica")){
-        insights.push(`Complexidade jurídica classificada como ${document.getElementById("complexidadeJuridica").value}.`);
-      }
-
-      if(!insights.length){
-        insights.push("Preencha os dados para rodar o filtro ISI.");
-      }
-
-      document.getElementById("insightsIndex2").innerHTML = insights.map(item => `<li>${item}</li>`).join("");
     }
 
-    function coletarPayload() {
-  return {
-    meta: { origem: "index-2", versao: "2.0" },
-    deal: {
-      tituloDeal: document.getElementById("tituloDeal").value,
-      cidadeUf: document.getElementById("cidadeUf").value,
-      bairro: document.getElementById("bairro").value,
-      tipoImovel: document.getElementById("tipoImovel").value,
-      metragem: document.getElementById("metragem").value,
-      origemOportunidade: document.getElementById("origemOportunidade").value,
-      matriculaNumero: document.getElementById("matriculaNumero").value,
-      comarcaRegistro: document.getElementById("comarcaRegistro").value
-    },
-    operacao: {
-      valorAquisicao: document.getElementById("valorAquisicao2").value,
-      valorVenda: document.getElementById("valorVenda2").value,
-      tipoPagamento: document.getElementById("tipoPagamento2").value || "À vista",
-      estrategiaSaida: document.getElementById("estrategiaSaida").value,
-      prazoSaidaMeses: document.getElementById('prazoSaidaMeses').value,
-      plano: document.getElementById("plano2").value || 0,
-      percAssessoria: document.getElementById("percAssessoria2").value || 0,
-      valorAssessoria: document.getElementById("valorAssessoria2").value,
-      documentacaoPerc: document.getElementById("documentacaoPerc2").value || 0,
-      documentacao: document.getElementById("documentacao2").value,
-      leiloeiroPerc: document.getElementById("leiloeiroPerc2").value || 0,
-      leiloeiro: document.getElementById("leiloeiro2").value,
-      corretorPerc: document.getElementById("corretorPerc2").value || 0,
-      corretor: document.getElementById("corretor2").value,
-      dividas: document.getElementById("dividas2").value,
-      reforma: document.getElementById("reforma2").value,
-      honorarios: document.getElementById("honorarios2").value,
-      condMensal: document.getElementById("condMensal2").value,
-      iptuMensal: document.getElementById("iptuMensal2").value,      
-    },
-    financiamento: {
-      entradaPerc: document.getElementById("entradaPerc2").value || 0,
-      entradaValor: document.getElementById("entradaValor2").value,
-      jurosAnual: document.getElementById("jurosAnual2").value || 0,
-      prazoFinanciamento: document.getElementById("prazoFinanciamento2").value || 0,
-      sistema: document.getElementById("sistema2").value || "SAC",
-      valorFinanciado: document.getElementById("valorFinanciado2").value,
-      parcelaEstimativa: document.getElementById("parcelaEstimativa2").value,
-      totalPagoAteSaida: document.getElementById("totalPagoAteSaida2").value
-    },
-    juridico: {
-      ocupado: document.getElementById("ocupado").value,
-      quemOcupa: document.getElementById("quemOcupa").value,
-      matriculaLimpa: document.getElementById("matriculaLimpa").value,
-      onusReais: document.getElementById("onusReais").value,
-      editalOk: document.getElementById("editalOk").value,
-      necessitaImissao: document.getElementById("necessitaImissao").value,
-      haProcessos: document.getElementById("haProcessos").value,
-      complexidadeJuridica: document.getElementById("complexidadeJuridica").value,
-      numerosProcessos: document.getElementById("numerosProcessos").value
-    },
-    mercado: {
-      valorMercado: document.getElementById("valorMercado").value,
-      liquidezRegiao: document.getElementById("liquidezRegiao").value,
-      vacanciaRegiao: document.getElementById("vacanciaRegiao").value,
-      riscoReforma: document.getElementById("riscoReforma").value,
-      benchmarkCdi: document.getElementById('benchmarkCdi').value,
-      observacoesAnalista: document.getElementById("observacoesAnalista").value
-    }
-  };
-}
+    setText("resumoTituloDeal", getValue("tituloDeal") || "—");
+    setText("resumoCidadeUf", getValue("cidadeUf") || "—");
+    setText("resumoAquisicao2", fmtBRL(parseCurrency(getValue("valorAquisicao2"))));
+    setText("resumoVenda2", fmtBRL(parseCurrency(getValue("valorVenda2"))));
 
+    const passivo =
+      parseCurrency(getValue("dividas2")) +
+      parseCurrency(getValue("reforma2"));
 
-    function abrirQuant2(){
-      const payload = coletarPayload();
-      sessionStorage.setItem(STORAGE_KEY_QUANT_V2, JSON.stringify(payload));
-      window.open("quant-2.html", "_blank");
+    setText("resumoPassivo2", fmtBRL(passivo));
+    setText("resumoEstrategia2", getValue("estrategiaSaida") || "—");
+
+    const insights = [];
+    const valorAquisicao = parseCurrency(getValue("valorAquisicao2"));
+    const valorVenda = parseCurrency(getValue("valorVenda2"));
+
+    if(valorAquisicao > 0 && valorVenda > 0){
+      const spreadBruto = valorVenda - valorAquisicao;
+      insights.push(`Spread bruto entre compra e venda: ${fmtBRL(spreadBruto)}.`);
     }
 
-    function limparIndex2(){
-      const ids = [
-        "tituloDeal","cidadeUf","bairro","tipoImovel","metragem","origemOportunidade","matriculaNumero","comarcaRegistro",
-        "valorAquisicao2","valorVenda2","tipoPagamento2","estrategiaSaida","prazoSaidaMeses","plano2","percAssessoria2","valorAssessoria2",
-        "documentacaoPerc2","documentacao2","leiloeiroPerc2","leiloeiro2","corretorPerc2","corretor2","dividas2","reforma2",
-        "honorarios2","condMensal2","iptuMensal2","entradaPerc2","entradaValor2","jurosAnual2","prazoFinanciamento2",
-        "sistema2","valorFinanciado2","parcelaEstimativa2","totalPagoAteSaida2","ocupado","quemOcupa","matriculaLimpa","onusReais",
-        "editalOk","necessitaImissao","haProcessos","complexidadeJuridica","numerosProcessos","valorMercado","liquidezRegiao",
-		"vacanciaRegiao","riscoReforma","benchmarkCdi","observacoesAnalista"
-      ];
-
-      ids.forEach(id => {
-        const el = document.getElementById(id);
-        if(!el) return;
-
-        if(el.tagName === "SELECT"){
-          el.selectedIndex = 0;
-        } else {
-          el.value = "";
-        }
-      });
-
-      document.getElementById("tipoPagamento2").value = "À vista";
-      document.getElementById("sistema2").value = "SAC";
-
-      handleTipoPagamentoChangeIndex2();
+    if(campoPreenchido("ocupado")){
+      insights.push(`Status de ocupação informado: ${getValue("ocupado")}.`);
     }
 
-    document.addEventListener("DOMContentLoaded", function(){
-      attachCurrencyFormatting([
-        "valorAquisicao2","valorVenda2","dividas2","reforma2","honorarios2","condMensal2","iptuMensal2","valorMercado"
-      ]);
+    if(campoPreenchido("complexidadeJuridica")){
+      insights.push(`Complexidade jurídica classificada como ${getValue("complexidadeJuridica")}.`);
+    }
 
-      [
-        "valorAquisicao2","valorVenda2","tipoPagamento2","estrategiaSaida","prazoSaidaMeses","plano2","percAssessoria2",
-        "documentacaoPerc2","leiloeiroPerc2","corretorPerc2","dividas2","reforma2","honorarios2","condMensal2","iptuMensal2",
-        "entradaPerc2","jurosAnual2","prazoFinanciamento2","sistema2","ocupado","quemOcupa","matriculaLimpa",
-        "onusReais","editalOk","necessitaImissao","haProcessos","complexidadeJuridica","valorMercado",
-        "liquidezRegiao","vacanciaRegiao","riscoReforma","benchmarkCdi","tituloDeal","cidadeUf","bairro","tipoImovel",
-        "metragem","origemOportunidade","matriculaNumero","comarcaRegistro","numerosProcessos",
-        "observacoesAnalista"
-      ].forEach(id => {
-        const el = document.getElementById(id);
-        if(!el) return;
-        el.addEventListener("input", atualizarPainel);
-        el.addEventListener("change", atualizarPainel);
-      });
+    if(campoPreenchido("dataAnalise")){
+      insights.push(`Análise datada em ${getValue("dataAnalise")}.`);
+    }
 
-      document.getElementById("tipoPagamento2").addEventListener("change", handleTipoPagamentoChangeIndex2);
-      document.getElementById("btnAbrirQuant2").addEventListener("click", abrirQuant2);
-      document.getElementById("btnLimparIndex2").addEventListener("click", limparIndex2);
+    if(campoPreenchido("tipoPrazoEdital") && campoPreenchido("dataPrazoEdital")){
+      insights.push(`Prazo do edital: ${getValue("tipoPrazoEdital")} em ${getValue("dataPrazoEdital")}.`);
+    }
 
-      handleTipoPagamentoChangeIndex2();
+    const insightsEl = getEl("insightsIndex2");
+    if(insightsEl){
+      insightsEl.innerHTML = (insights.length ? insights : ["Preencha os dados para rodar o filtro ISI."])
+        .map(item => `<li>${item}</li>`)
+        .join("");
+    }
+  }
+
+  function coletarPayload(){
+    return {
+      meta: { origem: "index-2", versao: "2.0" },
+
+      deal: {
+        dataAnalise: getValue("dataAnalise"),
+        analistaResponsavel: getValue("analistaResponsavel"),
+        tituloDeal: getValue("tituloDeal"),
+        cidadeUf: getValue("cidadeUf"),
+        bairro: getValue("bairro"),
+        tipoImovel: getValue("tipoImovel"),
+        metragem: getValue("metragem"),
+        origemOportunidade: getValue("origemOportunidade"),
+        matriculaNumero: getValue("matriculaNumero"),
+        comarcaRegistro: getValue("comarcaRegistro"),
+        linkMatricula: getValue("linkMatricula"),
+        linkEdital: getValue("linkEdital"),
+        tipoPrazoEdital: getValue("tipoPrazoEdital"),
+        dataPrazoEdital: getValue("dataPrazoEdital"),
+        lanceMinimoEdital: getValue("lanceMinimoEdital"),
+        valorAvaliacaoEdital: getValue("valorAvaliacaoEdital")
+      },
+
+      operacao: {
+        valorAquisicao: getValue("valorAquisicao2"),
+        valorVenda: getValue("valorVenda2"),
+        tipoPagamento: getValue("tipoPagamento2") || "À vista",
+        estrategiaSaida: getValue("estrategiaSaida"),
+        prazoSaidaMeses: getValue("prazoSaidaMeses"),
+        plano: getValue("plano2") || 0,
+        percAssessoria: getValue("percAssessoria2") || 0,
+        valorAssessoria: getValue("valorAssessoria2"),
+        documentacaoPerc: getValue("documentacaoPerc2") || 0,
+        documentacao: getValue("documentacao2"),
+        leiloeiroPerc: getValue("leiloeiroPerc2") || 0,
+        leiloeiro: getValue("leiloeiro2"),
+        corretorPerc: getValue("corretorPerc2") || 0,
+        corretor: getValue("corretor2"),
+        dividas: getValue("dividas2"),
+        reforma: getValue("reforma2"),
+        honorarios: getValue("honorarios2"),
+        condMensal: getValue("condMensal2"),
+        iptuMensal: getValue("iptuMensal2")
+      },
+
+      financiamento: {
+        entradaPerc: getValue("entradaPerc2") || 0,
+        entradaValor: getValue("entradaValor2"),
+        jurosAnual: getValue("jurosAnual2") || 0,
+        prazoFinanciamento: getValue("prazoFinanciamento2") || 0,
+        sistema: getValue("sistema2") || "SAC",
+        valorFinanciado: getValue("valorFinanciado2"),
+        parcelaEstimativa: getValue("parcelaEstimativa2"),
+        totalPagoAteSaida: getValue("totalPagoAteSaida2")
+      },
+
+      juridico: {
+        ocupado: getValue("ocupado"),
+        quemOcupa: getValue("quemOcupa"),
+        matriculaLimpa: getValue("matriculaLimpa"),
+        onusReais: getValue("onusReais"),
+        editalOk: getValue("editalOk"),
+        necessitaImissao: getValue("necessitaImissao"),
+        haProcessos: getValue("haProcessos"),
+        complexidadeJuridica: getValue("complexidadeJuridica"),
+        numerosProcessos: getValue("numerosProcessos")
+      },
+
+      mercado: {
+        valorMercado: getValue("valorMercado"),
+        liquidezRegiao: getValue("liquidezRegiao"),
+        vacanciaRegiao: getValue("vacanciaRegiao"),
+        riscoReforma: getValue("riscoReforma"),
+        benchmarkCdi: getValue("benchmarkCdi"),
+        linkComparaveis1: getValue("linkComparaveis1"),
+        linkComparaveis2: getValue("linkComparaveis2"),
+        linkComparaveis3: getValue("linkComparaveis3"),
+        observacoesAnalista: getValue("observacoesAnalista")
+      }
+    };
+  }
+
+  function abrirQuant2(){
+    const payload = coletarPayload();
+    sessionStorage.setItem(STORAGE_KEY_QUANT_V2, JSON.stringify(payload));
+    window.open("quant-2.html", "_blank");
+  }
+
+  function limparIndex2(){
+    const ids = [
+      "dataAnalise","analistaResponsavel",
+      "tituloDeal","cidadeUf","bairro","tipoImovel","metragem","origemOportunidade","matriculaNumero","comarcaRegistro",
+      "linkMatricula","linkEdital","tipoPrazoEdital","dataPrazoEdital","lanceMinimoEdital","valorAvaliacaoEdital",
+      "valorAquisicao2","valorVenda2","tipoPagamento2","estrategiaSaida","prazoSaidaMeses","plano2","percAssessoria2","valorAssessoria2",
+      "documentacaoPerc2","documentacao2","leiloeiroPerc2","leiloeiro2","corretorPerc2","corretor2","dividas2","reforma2",
+      "honorarios2","condMensal2","iptuMensal2","entradaPerc2","entradaValor2","jurosAnual2","prazoFinanciamento2",
+      "sistema2","valorFinanciado2","parcelaEstimativa2","totalPagoAteSaida2","ocupado","quemOcupa","matriculaLimpa","onusReais",
+      "editalOk","necessitaImissao","haProcessos","complexidadeJuridica","numerosProcessos","valorMercado","liquidezRegiao",
+      "vacanciaRegiao","riscoReforma","benchmarkCdi","linkComparaveis1","linkComparaveis2","linkComparaveis3","observacoesAnalista"
+    ];
+
+    ids.forEach(id => {
+      const el = getEl(id);
+      if(!el) return;
+
+      if(el.tagName === "SELECT"){
+        el.selectedIndex = 0;
+      } else {
+        el.value = "";
+      }
     });
-  </script>
+
+    setValue("dataAnalise", hojeISO());
+    setValue("tipoPagamento2", "À vista");
+    setValue("sistema2", "SAC");
+
+    handleTipoPagamentoChangeIndex2();
+  }
+
+  document.addEventListener("DOMContentLoaded", function(){
+    const dataEl = getEl("dataAnalise");
+    if(dataEl && !dataEl.value){
+      dataEl.value = hojeISO();
+    }
+
+    attachCurrencyFormatting([
+      "valorAquisicao2","valorVenda2","dividas2","reforma2","honorarios2","condMensal2","iptuMensal2","valorMercado",
+      "lanceMinimoEdital","valorAvaliacaoEdital"
+    ]);
+
+    [
+      "dataAnalise","analistaResponsavel",
+      "valorAquisicao2","valorVenda2","tipoPagamento2","estrategiaSaida","prazoSaidaMeses","plano2","percAssessoria2",
+      "documentacaoPerc2","leiloeiroPerc2","corretorPerc2","dividas2","reforma2","honorarios2","condMensal2","iptuMensal2",
+      "entradaPerc2","jurosAnual2","prazoFinanciamento2","sistema2","ocupado","quemOcupa","matriculaLimpa",
+      "onusReais","editalOk","necessitaImissao","haProcessos","complexidadeJuridica","valorMercado",
+      "liquidezRegiao","vacanciaRegiao","riscoReforma","benchmarkCdi","tituloDeal","cidadeUf","bairro","tipoImovel",
+      "metragem","origemOportunidade","matriculaNumero","comarcaRegistro","numerosProcessos","observacoesAnalista",
+      "linkMatricula","linkEdital","tipoPrazoEdital","dataPrazoEdital","lanceMinimoEdital","valorAvaliacaoEdital",
+      "linkComparaveis1","linkComparaveis2","linkComparaveis3"
+    ].forEach(id => {
+      const el = getEl(id);
+      if(!el) return;
+      el.addEventListener("input", atualizarPainel);
+      el.addEventListener("change", atualizarPainel);
+    });
+
+    const tipoPagamentoEl = getEl("tipoPagamento2");
+    if(tipoPagamentoEl){
+      tipoPagamentoEl.addEventListener("change", handleTipoPagamentoChangeIndex2);
+    }
+
+    const btnAbrir = getEl("btnAbrirQuant2");
+    if(btnAbrir){
+      btnAbrir.addEventListener("click", abrirQuant2);
+    }
+
+    const btnLimpar = getEl("btnLimparIndex2");
+    if(btnLimpar){
+      btnLimpar.addEventListener("click", limparIndex2);
+    }
+
+    handleTipoPagamentoChangeIndex2();
+  });
+</script>
+
+
 </body>
 </html>
