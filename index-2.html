@@ -37,8 +37,8 @@
 
   <div class="wrap">
     <div class="top-switch">
-      <a href="index.html" class="btn-secondary">Modo simples</a>
-      <a href="index-2.html" class="btn-primary is-current">Filtro Quant</a>
+      <a href="index.html" class="btn-secondary">Alterar para modelo simples</a>
+      
     </div>
   </div>
 
@@ -141,7 +141,7 @@
 
             <div class="field">
               <label for="prazoSaidaMeses">Janela de liquidez (meses)</label>
-              <input id="prazoSaidaMeses" type="number" step="1" value="12" />
+              <input id="prazoSaidaMeses" type="number" step="1">
             </div>
 
             <div class="field">
@@ -226,10 +226,7 @@
               <input id="iptuMensal2" type="text" />
             </div>
 
-            <div class="field">
-              <label for="custoObraPrazo">Prazo de obra (meses)</label>
-              <input id="custoObraPrazo" type="number" step="1" value="0" />
-            </div>
+            
           </div>
         </div>
 
@@ -367,12 +364,7 @@
             </div>
 
             <div class="field field-span-2">
-              <label for="resumoJuridico">Síntese jurídica</label>
-              <textarea id="resumoJuridico" rows="4" placeholder="Descreva matrícula, edital, ações, ocupação, riscos e providências."></textarea>
-            </div>
-
-            <div class="field field-span-2">
-              <label for="numerosProcessos">Números de processos / observações</label>
+              <label for="numerosProcessos">Síntese jurídica</label>
               <textarea id="numerosProcessos" rows="3" placeholder="Liste processos, ação possessória, usucapião, execução, etc."></textarea>
             </div>
           </div>
@@ -419,16 +411,11 @@
 
             <div class="field">
               <label for="benchmarkCdi">CDI de referência (%)</label>
-              <input id="benchmarkCdi" type="number" step="0.01" value="12.00" />
+              <input id="benchmarkCdi" type="number" step="0.01">
             </div>
 
             <div class="field field-span-2">
-              <label for="teseInvestimento">Tese de alocação</label>
-              <textarea id="teseInvestimento" rows="4" placeholder="Ex.: arrematar, regularizar ocupação, reforma leve e revender em 12 meses."></textarea>
-            </div>
-
-            <div class="field field-span-2">
-              <label for="observacoesAnalista">Tese, riscos e condicionantes</label>
+              <label for="observacoesAnalista">Tese de alocação, riscos e condicionantes</label>
               <textarea id="observacoesAnalista" rows="5" placeholder="Pontos críticos, tese, upside, red flags e condicionantes."></textarea>
             </div>
           </div>
@@ -734,14 +721,24 @@ function normalizarTipoPagamento(valor) {
       atualizarPercentuais();
 
       const essenciaisFinanceiro = [
-        "valorAquisicao2", "valorVenda2", "tipoPagamento2", "prazoSaidaMeses",
-        "documentacaoPerc2", "leiloeiroPerc2", "corretorPerc2", "plano2"
-      ];
+  'valorAquisicao2',
+  'valorVenda2',
+  'documentacaoPerc2',
+  'leiloeiroPerc2',
+  'prazoSaidaMeses',
+  'corretorPerc2'
+];
+
 
       const essenciaisJuridico = [
-        "matriculaNumero", "editalOk", "ocupado", "matriculaLimpa",
-        "haProcessos", "complexidadeJuridica", "teseInvestimento"
-      ];
+  'matriculaNumero',
+  'editalOk',
+  'ocupado',
+  'matriculaLimpa',
+  'haProcessos',
+  'complexidadeJuridica'
+];
+
 
       const financeFilled = essenciaisFinanceiro.filter(campoPreenchido).length;
       const juridicoFilled = essenciaisJuridico.filter(campoPreenchido).length;
@@ -821,7 +818,7 @@ function normalizarTipoPagamento(valor) {
       valorVenda: document.getElementById("valorVenda2").value,
       tipoPagamento: document.getElementById("tipoPagamento2").value || "À vista",
       estrategiaSaida: document.getElementById("estrategiaSaida").value,
-      prazoSaidaMeses: document.getElementById("prazoSaidaMeses").value || 12,
+      prazoSaidaMeses: document.getElementById('prazoSaidaMeses').value,
       plano: document.getElementById("plano2").value || 0,
       percAssessoria: document.getElementById("percAssessoria2").value || 0,
       valorAssessoria: document.getElementById("valorAssessoria2").value,
@@ -835,8 +832,7 @@ function normalizarTipoPagamento(valor) {
       reforma: document.getElementById("reforma2").value,
       honorarios: document.getElementById("honorarios2").value,
       condMensal: document.getElementById("condMensal2").value,
-      iptuMensal: document.getElementById("iptuMensal2").value,
-      custoObraPrazo: document.getElementById("custoObraPrazo").value || 0
+      iptuMensal: document.getElementById("iptuMensal2").value,      
     },
     financiamento: {
       entradaPerc: document.getElementById("entradaPerc2").value || 0,
@@ -857,7 +853,6 @@ function normalizarTipoPagamento(valor) {
       necessitaImissao: document.getElementById("necessitaImissao").value,
       haProcessos: document.getElementById("haProcessos").value,
       complexidadeJuridica: document.getElementById("complexidadeJuridica").value,
-      resumoJuridico: document.getElementById("resumoJuridico").value,
       numerosProcessos: document.getElementById("numerosProcessos").value
     },
     mercado: {
@@ -865,8 +860,7 @@ function normalizarTipoPagamento(valor) {
       liquidezRegiao: document.getElementById("liquidezRegiao").value,
       vacanciaRegiao: document.getElementById("vacanciaRegiao").value,
       riscoReforma: document.getElementById("riscoReforma").value,
-      benchmarkCdi: document.getElementById("benchmarkCdi").value || 12.00,
-      teseInvestimento: document.getElementById("teseInvestimento").value,
+      benchmarkCdi: document.getElementById('benchmarkCdi').value,
       observacoesAnalista: document.getElementById("observacoesAnalista").value
     }
   };
@@ -884,10 +878,10 @@ function normalizarTipoPagamento(valor) {
         "tituloDeal","cidadeUf","bairro","tipoImovel","metragem","origemOportunidade","matriculaNumero","comarcaRegistro",
         "valorAquisicao2","valorVenda2","tipoPagamento2","estrategiaSaida","prazoSaidaMeses","plano2","percAssessoria2","valorAssessoria2",
         "documentacaoPerc2","documentacao2","leiloeiroPerc2","leiloeiro2","corretorPerc2","corretor2","dividas2","reforma2",
-        "honorarios2","condMensal2","iptuMensal2","custoObraPrazo","entradaPerc2","entradaValor2","jurosAnual2","prazoFinanciamento2",
+        "honorarios2","condMensal2","iptuMensal2","entradaPerc2","entradaValor2","jurosAnual2","prazoFinanciamento2",
         "sistema2","valorFinanciado2","parcelaEstimativa2","totalPagoAteSaida2","ocupado","quemOcupa","matriculaLimpa","onusReais",
-        "editalOk","necessitaImissao","haProcessos","complexidadeJuridica","resumoJuridico","numerosProcessos","valorMercado","liquidezRegiao",
-		"vacanciaRegiao","riscoReforma","benchmarkCdi","teseInvestimento","observacoesAnalista"
+        "editalOk","necessitaImissao","haProcessos","complexidadeJuridica","numerosProcessos","valorMercado","liquidezRegiao",
+		"vacanciaRegiao","riscoReforma","benchmarkCdi","observacoesAnalista"
       ];
 
       ids.forEach(id => {
@@ -902,10 +896,7 @@ function normalizarTipoPagamento(valor) {
       });
 
       document.getElementById("tipoPagamento2").value = "À vista";
-      document.getElementById("prazoSaidaMeses").value = "12";
-      document.getElementById("custoObraPrazo").value = "0";
       document.getElementById("sistema2").value = "SAC";
-      document.getElementById("benchmarkCdi").value = "12.00";
 
       handleTipoPagamentoChangeIndex2();
     }
@@ -918,11 +909,11 @@ function normalizarTipoPagamento(valor) {
       [
         "valorAquisicao2","valorVenda2","tipoPagamento2","estrategiaSaida","prazoSaidaMeses","plano2","percAssessoria2",
         "documentacaoPerc2","leiloeiroPerc2","corretorPerc2","dividas2","reforma2","honorarios2","condMensal2","iptuMensal2",
-        "custoObraPrazo","entradaPerc2","jurosAnual2","prazoFinanciamento2","sistema2","ocupado","quemOcupa","matriculaLimpa",
+        "entradaPerc2","jurosAnual2","prazoFinanciamento2","sistema2","ocupado","quemOcupa","matriculaLimpa",
         "onusReais","editalOk","necessitaImissao","haProcessos","complexidadeJuridica","valorMercado",
         "liquidezRegiao","vacanciaRegiao","riscoReforma","benchmarkCdi","tituloDeal","cidadeUf","bairro","tipoImovel",
-        "metragem","origemOportunidade","matriculaNumero","comarcaRegistro","resumoJuridico","numerosProcessos",
-        "teseInvestimento","observacoesAnalista"
+        "metragem","origemOportunidade","matriculaNumero","comarcaRegistro","numerosProcessos",
+        "observacoesAnalista"
       ].forEach(id => {
         const el = document.getElementById(id);
         if(!el) return;
