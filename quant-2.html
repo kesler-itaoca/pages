@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="quant-2.css" />
+  <script src="auth-itaoca.js"></script>
 </head>
 <body>
   <header class="header-itaoca">
@@ -22,6 +23,24 @@
   </header>
 
   <div class="header-gold-line"></div>
+  <div class="wrap">
+  <div class="top-toolbar">
+    <div class="top-toolbar__left">
+      <a href="index-2.html" class="btn-secondary top-toolbar__back">Voltar para edição</a>
+    </div>
+
+    <div class="top-toolbar__right">
+      <div class="user-chip">
+        <span class="user-chip__label">Usuário:</span>
+        <strong class="user-chip__name" id="authUserName"></strong>
+      </div>
+
+      <button type="button" class="btn-secondary top-toolbar__btn top-toolbar__btn--logout" id="btnLogoutQuant2">
+        Sair
+      </button>
+    </div>
+  </div>
+</div>
 
   <div class="wrap">
 </div>
@@ -1385,45 +1404,56 @@ function salvarPDF() {
 }
 
 
-  function inicializar(){
-    const bruto = obterPayload();
+  function inicializar() {
+  if (!exigirLoginItaoca()) return;
 
-    if(!bruto){
-      document.getElementById("cardSemDados").style.display = "block";
-      return;
-    }
+  preencherUsuarioLogado(['authUserName']);
 
-    const payload = normalizarPayload(bruto);
-    const operacional = calcularOperacional(payload);
-    const fiscal = calcularFiscal(payload, operacional);
-    const serie = calcularSerieMensal(payload);
-    const sensibilidade = gerarSensibilidade(payload);
-
-    const breakdown = {
-      retorno: scoreRetorno(operacional, fiscal),
-      juridico: scoreJuridico(payload),
-      mercado: scoreMercado(payload),
-      execucao: scoreExecucao(payload)
-    };
-
-    const veredito = gerarVeredito(payload, operacional, fiscal, breakdown);
-    const leituras = montarLeituras(payload, operacional, fiscal, veredito);
-
-    renderHero(veredito, fiscal, operacional);
-    renderKPIs(operacional, fiscal);
-    renderDeal(payload);
-    renderDiagnostico(breakdown, leituras);
-    renderOperacional(operacional);
-	renderPlanoContratado(payload, operacional);
-    renderFiscal(fiscal);
-    renderMercado(payload, operacional, fiscal);
-    renderJuridico(payload);
-    renderComparativo(operacional, fiscal);
-    renderSensibilidade(sensibilidade);
-    renderMeses(serie);
+  const btnLogout = document.getElementById('btnLogoutQuant2');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', function () {
+      sairItaoca('login.html');
+    });
   }
 
-  document.addEventListener("DOMContentLoaded", inicializar);
+  const bruto = obterPayload();
+  if (!bruto) {
+    document.getElementById('cardSemDados').style.display = 'block';
+    return;
+  }
+
+  const payload = normalizarPayload(bruto);
+  const operacional = calcularOperacional(payload);
+  const fiscal = calcularFiscal(payload, operacional);
+  const serie = calcularSerieMensal(payload);
+  const sensibilidade = gerarSensibilidade(payload);
+
+  const breakdown = {
+    retorno: scoreRetorno(operacional, fiscal),
+    juridico: scoreJuridico(payload),
+    mercado: scoreMercado(payload),
+    execucao: scoreExecucao(payload)
+  };
+
+  const veredito = gerarVeredito(payload, operacional, fiscal, breakdown);
+  const leituras = montarLeituras(payload, operacional, fiscal, veredito);
+
+  renderHero(veredito, fiscal, operacional);
+  renderKPIs(operacional, fiscal);
+  renderDeal(payload);
+  renderDiagnostico(breakdown, leituras);
+  renderOperacional(operacional);
+  renderPlanoContratado(payload, operacional);
+  renderFiscal(fiscal);
+  renderMercado(payload, operacional, fiscal);
+  renderJuridico(payload);
+  renderComparativo(operacional, fiscal);
+  renderSensibilidade(sensibilidade);
+  renderMeses(serie);
+}
+
+document.addEventListener('DOMContentLoaded', inicializar);
+
 </script>
 
   
