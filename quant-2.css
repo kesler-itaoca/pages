@@ -1,8 +1,20 @@
+/* =========================================================
+   ESTRUTURA GERAL DA PÁGINA
+   ---------------------------------------------------------
+   - Organiza o fluxo principal da Quant 2.0
+   - Define espaçamento vertical entre os blocos
+   ========================================================= */
 .quant2-wrap {
   display: grid;
   gap: 18px;
 }
 
+/* =========================================================
+   BARRAS SUPERIORES / AÇÕES
+   ---------------------------------------------------------
+   - Toolbar superior, caso exista
+   - Switch de navegação entre páginas/modos
+   ========================================================= */
 .toolbar-quant2 {
   display: flex;
   justify-content: flex-end;
@@ -35,6 +47,11 @@
   box-shadow: 0 10px 20px rgba(166,130,61,0.22);
 }
 
+/* =========================================================
+   HERO / CABEÇALHO DO RELATÓRIO
+   ---------------------------------------------------------
+   - Bloco principal com status, veredito e score
+   ========================================================= */
 .hero-quant2 {
   margin-bottom: 0;
 }
@@ -83,6 +100,11 @@
   grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
+/* =========================================================
+   KPIs E BOXES RESUMIDOS
+   ---------------------------------------------------------
+   - Grade dos principais indicadores
+   ========================================================= */
 .kpi-grid {
   display: grid;
   gap: 14px;
@@ -118,24 +140,65 @@
   word-break: break-word;
 }
 
+/* =========================================================
+   GRIDS GENÉRICOS DA PÁGINA
+   ---------------------------------------------------------
+   - Layout padrão de duas colunas
+   ========================================================= */
 .quant2-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: clamp(16px, 2vw, 24px);
+  align-items: start;
 }
 
+.quant2-grid > .card {
+  align-self: start;
+}
+
+/* =========================================================
+   PAINÉIS DE APOIO
+   ---------------------------------------------------------
+   - Blocos de observações, leitura, recomendação, links etc.
+   ========================================================= */
 .support-panel-gap {
-  margin-top: 16px;
+  margin-top: 18px;
 }
 
-.support-text {
+.support-panel {
+  border: 1px dashed rgba(166,130,61,0.28);
+  background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(166,130,61,0.035));
+  border-radius: 18px;
+  padding: 18px 22px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+}
+
+.support-panel .support-title {
+  margin: 0 0 10px 0;
+  font-size: 1.1rem;
+  line-height: 1.25;
+  color: #1B3A3C;
+}
+
+.support-text,
+.support-panel .support-text {
   margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.6;
   color: #4B5563;
-  line-height: 1.65;
-  font-size: 0.9rem;
   white-space: pre-wrap;
 }
 
+#resumoJuridicoTexto,
+#processosTexto {
+  min-height: 0;
+}
+
+/* =========================================================
+   DIAGNÓSTICO / COMPOSIÇÃO ISI
+   ---------------------------------------------------------
+   - Boxes pequenos de score por eixo
+   ========================================================= */
 .diagnostico-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -164,6 +227,11 @@
   color: #1B3A3C;
 }
 
+/* =========================================================
+   TABELAS GENÉRICAS
+   ---------------------------------------------------------
+   - Tabelas comparativas, sensibilidade etc.
+   ========================================================= */
 .table-wrap {
   overflow-x: auto;
 }
@@ -198,6 +266,11 @@
   background: rgba(166,130,61,0.07);
 }
 
+/* =========================================================
+   PILLS / STATUS
+   ---------------------------------------------------------
+   - Chips coloridos usados em jurídico e status
+   ========================================================= */
 .pill {
   display: inline-flex;
   align-items: center;
@@ -240,6 +313,11 @@
   border-color: rgba(22,163,74,0.18);
 }
 
+/* =========================================================
+   TÍTULOS MENORES
+   ---------------------------------------------------------
+   - Subtítulos internos como "IR por faixa"
+   ========================================================= */
 .mini-title {
   margin: 0 0 8px 0;
   font-size: 0.9rem;
@@ -247,6 +325,15 @@
   color: #1B3A3C;
 }
 
+.ir-faixas-list .stat:last-child {
+  border-bottom: none;
+}
+
+/* =========================================================
+   GRADE DE EVOLUÇÃO MENSAL
+   ---------------------------------------------------------
+   - Cards de resultado por mês
+   ========================================================= */
 .meses-grid-quant2 {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -345,6 +432,118 @@
   text-align: right;
 }
 
+/* =========================================================
+   TABELA JURÍDICA
+   ---------------------------------------------------------
+   - Ajustes específicos da matriz jurídica
+   ========================================================= */
+.table-wrap-juridico {
+  overflow-x: hidden;
+}
+
+.quant-table-juridico {
+  width: 100%;
+  min-width: 0;
+  table-layout: fixed;
+}
+
+.quant-table-juridico th,
+.quant-table-juridico td {
+  padding: 10px 16px;
+  word-break: break-word;
+  overflow-wrap: anywhere;
+  line-height: 1.2;
+}
+
+.quant-table-juridico th:nth-child(1),
+.quant-table-juridico td:nth-child(1) {
+  width: 23%;
+}
+
+.quant-table-juridico th:nth-child(2),
+.quant-table-juridico td:nth-child(2) {
+  width: 24%;
+}
+
+.quant-table-juridico th:nth-child(3),
+.quant-table-juridico td:nth-child(3) {
+  width: 53%;
+}
+
+.quant-table-juridico tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.quant-table-juridico .pill {
+  min-width: 108px;
+  padding: 5px 12px;
+  font-size: 0.72rem;
+}
+
+.quant-table-juridico td:nth-child(2) {
+  white-space: nowrap;
+}
+
+.quant-table-juridico td:nth-child(2) .pill {
+  white-space: nowrap;
+}
+
+/* =========================================================
+   GRID DO RESUMO / ISI / PLANO
+   ---------------------------------------------------------
+   - Layout de tela:
+   - Resumo à esquerda ocupando duas linhas
+   - ISI em cima à direita
+   - Plano embaixo à direita
+   ========================================================= */
+.quant2-grid--deal {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(16px, 2vw, 24px);
+  align-items: start;
+  grid-template-areas:
+    "resumo isi"
+    "resumo plano";
+}
+
+.card-resumo-ativo {
+  grid-area: resumo;
+}
+
+.card-isi {
+  grid-area: isi;
+}
+
+.card-plano {
+  grid-area: plano;
+}
+
+/* Pequeno ajuste legado, caso exista */
+.plano-panel .stat:first-of-type {
+  margin-top: 6px;
+}
+
+/* =========================================================
+   BOTÃO FINAL DE PDF
+   ---------------------------------------------------------
+   - Botão centralizado no rodapé da página
+   ========================================================= */
+.pdf-actions {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+  padding: 8px 0 4px;
+}
+
+.pdf-actions .btn-primary {
+  min-width: 220px;
+}
+
+/* =========================================================
+   RESPONSIVIDADE - MÉDIO
+   ---------------------------------------------------------
+   - Reduz grades em telas menores
+   ========================================================= */
 @media (max-width: 1320px) {
   .kpi-grid-6 {
     grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -359,6 +558,11 @@
   }
 }
 
+/* =========================================================
+   RESPONSIVIDADE - TABLET
+   ---------------------------------------------------------
+   - Empilha grids principais
+   ========================================================= */
 @media (max-width: 980px) {
   .quant2-grid,
   .meses-grid-quant2,
@@ -370,8 +574,29 @@
   .hero-topline {
     grid-template-columns: 1fr;
   }
+
+  .quant2-grid--deal {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "resumo"
+      "isi"
+      "plano";
+  }
+
+  .table-wrap-juridico {
+    overflow-x: auto;
+  }
+
+  .quant-table-juridico {
+    min-width: 720px;
+  }
 }
 
+/* =========================================================
+   RESPONSIVIDADE - MOBILE
+   ---------------------------------------------------------
+   - Expande botões e ajusta cards mensais
+   ========================================================= */
 @media (max-width: 760px) {
   .top-switch,
   .toolbar-quant2 {
@@ -381,7 +606,8 @@
   .top-switch .btn-secondary,
   .top-switch .btn-primary,
   .toolbar-quant2 .btn-secondary,
-  .toolbar-quant2 .btn-primary {
+  .toolbar-quant2 .btn-primary,
+  .pdf-actions .btn-primary {
     width: 100%;
     min-width: 0;
   }
@@ -392,160 +618,388 @@
   }
 }
 
+/* mantém a proteção geral */
+.card {
+  box-shadow: none !important;
+  border-radius: 9px !important;
+  padding: 9px 10px !important;
+  break-inside: avoid !important;
+  page-break-inside: avoid !important;
+}
+
+/* EXCEÇÃO: o card da evolução mensal pode quebrar entre páginas */
+.card:has(.meses-grid-quant2) {
+  break-inside: auto !important;
+  page-break-inside: auto !important;
+}
+
+
+/* =========================================================
+   CONFIGURAÇÃO DA PÁGINA DE IMPRESSÃO
+   ---------------------------------------------------------
+   - Define orientação e margem do PDF
+   - VERSÃO RETRATO EM MEIO TERMO
+   - EVOLUÇÃO MENSAL EM PÁGINA PRÓPRIA
+   ========================================================= */
+@page {
+  size: A4 portrait;
+  margin: 8mm;
+}
+
 @media print {
+  html,
+  body {
+    width: 100%;
+    min-height: auto;
+    overflow: visible !important;
+    background: #fff !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    font-size: 98.5% !important;
+  }
+
+  .pdf-actions,
   .toolbar-quant2,
   .top-switch {
     display: none !important;
   }
 
-  .quant2-grid {
-    grid-template-columns: 1fr 1fr !important;
+  .wrap,
+  main,
+  .quant2-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    gap: 7px !important;
   }
 
-  .meses-grid-quant2 {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-    gap: 8px !important;
+  .card {
+    box-shadow: none !important;
+    border-radius: 9px !important;
+    padding: 9px 10px !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
   }
 
-  .quant-table th,
-  .quant-table td {
-    font-size: 10px !important;
-    padding: 6px 8px !important;
+  .hero-topline {
+    grid-template-columns: 1fr !important;
+    gap: 7px !important;
+    align-items: start !important;
+    margin-bottom: 7px !important;
+  }
+
+  .hero-metrics-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+  }
+
+  .hero-metric {
+    padding: 8px 9px !important;
+  }
+
+  .hero-metric-label {
+    font-size: 0.66rem !important;
+    line-height: 1.13 !important;
+  }
+
+  .hero-metric-value {
+    font-size: 0.87rem !important;
+    line-height: 1.13 !important;
+  }
+
+  .score-box {
+    padding: 10px 9px !important;
+    border-radius: 10px !important;
+  }
+
+  .score-label {
+    font-size: 0.66rem !important;
+    margin-bottom: 2px !important;
+  }
+
+  .score-value {
+    font-size: 1.62rem !important;
+    margin-bottom: 3px !important;
+    line-height: 1 !important;
+  }
+
+  .score-caption {
+    font-size: 0.62rem !important;
+    line-height: 1.1 !important;
   }
 
   .kpi-grid-6 {
-    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
-  }
-}
-
-
-/* Ajustes visuais jurídicos e bloco lateral */
-.table-wrap-juridico{overflow-x:hidden;}
-.quant-table-juridico{width:100%;min-width:0;table-layout:fixed;}
-.quant-table-juridico th,
-.quant-table-juridico td{padding:14px 16px;word-break:break-word;overflow-wrap:anywhere;}
-.quant-table-juridico th:nth-child(1),
-.quant-table-juridico td:nth-child(1){width:26%;}
-.quant-table-juridico th:nth-child(2),
-.quant-table-juridico td:nth-child(2){width:20%;}
-.quant-table-juridico th:nth-child(3),
-.quant-table-juridico td:nth-child(3){width:54%;}
-.quant-table-juridico tbody tr:last-child td{border-bottom:none;}
-.quant-table-juridico .pill{min-width:110px;}
-
-.support-panel-gap{margin-top:18px;}
-.support-panel{
-  border:1px dashed rgba(166,130,61,0.28);
-  background:linear-gradient(180deg, rgba(255,255,255,0.94), rgba(166,130,61,0.035));
-  border-radius:18px;
-  padding:18px 22px;
-  box-shadow:inset 0 1px 0 rgba(255,255,255,0.7);
-}
-.support-panel .support-title{
-  margin:0 0 10px 0;
-  font-size:1.1rem;
-  line-height:1.25;
-  color:#1B3A3C;
-}
-.support-panel .support-text{
-  font-size:0.98rem;
-  line-height:1.6;
-  color:#4B5563;
-}
-#resumoJuridicoTexto,
-#processosTexto{min-height:0;}
-.ir-faixas-list .stat:last-child{border-bottom:none;}
-
-@media (max-width: 980px){
-  .table-wrap-juridico{overflow-x:auto;}
-  .quant-table-juridico{min-width:720px;}
-}
-
-.quant2-grid{
-  align-items: start;
-}
-
-.quant2-grid > .card{
-  align-self: start;
-}
-
-.table-wrap-juridico{
-  overflow-x: hidden;
-}
-
-.quant-table-juridico{
-  width: 100%;
-  min-width: 0;
-  table-layout: fixed;
-}
-
-.quant-table-juridico th,
-.quant-table-juridico td{
-  word-break: break-word;
-  overflow-wrap: anywhere;
-}
-
-.quant-table-juridico th:nth-child(1),
-.quant-table-juridico td:nth-child(1){
-  width: 24%;
-}
-
-.quant-table-juridico th:nth-child(2),
-.quant-table-juridico td:nth-child(2){
-  width: 18%;
-}
-
-.quant-table-juridico th:nth-child(3),
-.quant-table-juridico td:nth-child(3){
-  width: 58%;
-}
-
-@media (max-width: 980px){
-  .table-wrap-juridico{
-    overflow-x: auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px !important;
   }
 
-  .quant-table-juridico{
-    min-width: 720px;
+  .kpi-box {
+    padding: 9px 10px !important;
+    border-radius: 9px !important;
   }
-}
 
-/* Refino da matriz jurídica */
-.quant-table-juridico th,
-.quant-table-juridico td{
-  padding: 10px 16px;
-}
+  .kpi-label,
+  .diag-label,
+  .stat .label {
+    font-size: 0.62rem !important;
+    line-height: 1.13 !important;
+  }
 
-.quant-table-juridico th:nth-child(1),
-.quant-table-juridico td:nth-child(1){
-  width: 23%;
-}
+  .kpi-value,
+  .diag-value,
+  .stat .value {
+    font-size: 0.81rem !important;
+    line-height: 1.13 !important;
+  }
 
-.quant-table-juridico th:nth-child(2),
-.quant-table-juridico td:nth-child(2){
-  width: 24%;
-}
+  .support-panel {
+    padding: 8px 9px !important;
+    border-radius: 9px !important;
+  }
 
-.quant-table-juridico th:nth-child(3),
-.quant-table-juridico td:nth-child(3){
-  width: 53%;
-}
+  .support-panel-gap {
+    margin-top: 8px !important;
+  }
 
-.quant-table-juridico .pill{
-  min-width: 108px;
-  padding: 5px 12px;
-  font-size: 0.72rem;
-}
+  .support-panel .support-title {
+    font-size: 0.8rem !important;
+    margin-bottom: 4px !important;
+    line-height: 1.15 !important;
+  }
 
-.quant-table-juridico td:nth-child(2){
-  white-space: nowrap;
-}
+  .support-panel .support-text,
+  .support-list li,
+  .small-muted {
+    font-size: 0.685rem !important;
+    line-height: 1.22 !important;
+  }
 
-.quant-table-juridico td:nth-child(2) .pill{
-  white-space: nowrap;
-}
+  .support-list,
+  .support-list li,
+  ul,
+  ol {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
 
-.quant-table-juridico td,
-.quant-table-juridico th{
-  line-height: 1.2;
+  .stat {
+    padding: 3px 0 !important;
+    margin: 0 !important;
+  }
+
+  .section-title {
+    font-size: 0.93rem !important;
+    margin-bottom: 6px !important;
+    line-height: 1.09 !important;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .mini-title {
+    font-size: 0.76rem !important;
+    margin: 0 0 4px 0 !important;
+    line-height: 1.11 !important;
+    break-after: avoid;
+    page-break-after: avoid;
+  }
+
+  .divider {
+    margin: 6px 0 !important;
+  }
+
+  .table-wrap,
+  .table-wrap-juridico {
+    overflow: visible !important;
+  }
+
+  .quant-table,
+  .quant-table-juridico {
+    width: 100% !important;
+    min-width: 0 !important;
+    table-layout: fixed !important;
+  }
+
+  .quant-table th,
+  .quant-table td,
+  .quant-table-juridico th,
+  .quant-table-juridico td {
+    font-size: 8.5px !important;
+    line-height: 1.15 !important;
+    padding: 4px 5px !important;
+    white-space: normal !important;
+    word-break: break-word !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .quant-table th,
+  .quant-table-juridico th {
+    font-size: 8.3px !important;
+  }
+
+  .quant-table-juridico .pill,
+  .pill {
+    min-width: 0 !important;
+    padding: 2px 5px !important;
+    font-size: 7.9px !important;
+    line-height: 1.07 !important;
+    white-space: normal !important;
+  }
+
+  .quant2-grid--deal {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    grid-template-areas:
+      "resumo"
+      "isi"
+      "plano" !important;
+    gap: 7px !important;
+    align-items: start !important;
+    overflow: visible !important;
+    margin-bottom: 8px !important;
+  }
+
+  .quant2-grid--deal::after {
+    content: none !important;
+    display: none !important;
+    clear: none !important;
+  }
+
+  .card-resumo-ativo,
+  .card-isi,
+  .card-plano {
+    float: none !important;
+    clear: none !important;
+    width: auto !important;
+    box-sizing: border-box;
+    padding: 9px 10px !important;
+    align-self: start !important;
+    margin: 0 !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+  }
+
+  .card-resumo-ativo {
+    grid-area: resumo !important;
+  }
+
+  .card-isi {
+    grid-area: isi !important;
+  }
+
+  .card-plano {
+    grid-area: plano !important;
+    margin-top: 0 !important;
+    break-before: avoid !important;
+    page-break-before: avoid !important;
+  }
+
+  .card-isi .diag-box {
+    padding: 8px 9px !important;
+    border-radius: 8px !important;
+  }
+
+  .diagnostico-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 5px !important;
+  }
+
+  .quant2-grid,
+  .quant2-grid--deal + .quant2-grid,
+  .quant2-grid + .quant2-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 7px !important;
+    margin-top: 7px !important;
+    clear: none !important;
+  }
+
+  /* =====================================================
+     EVOLUÇÃO MENSAL EM PÁGINA COMPLETA
+     ===================================================== */
+  .card:has(.meses-grid-quant2) {
+    break-before: page !important;
+    page-break-before: always !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    min-height: calc(297mm - 16mm) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: flex-start !important;
+  }
+
+  .card:has(.meses-grid-quant2) .section-title,
+  .card:has(.meses-grid-quant2) .small-muted {
+    flex: 0 0 auto !important;
+  }
+
+  .meses-grid-quant2 {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    overflow: visible !important;
+    margin-top: 6px !important;
+    flex: 1 1 auto !important;
+    align-content: start !important;
+  }
+
+  .meses-grid-quant2 .quant-mes-card {
+    width: auto !important;
+    margin: 0 !important;
+    padding: 8px 9px !important;
+    border-radius: 8px !important;
+    box-sizing: border-box !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    float: none !important;
+  }
+
+  .quant-mes-topo {
+    gap: 4px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .quant-mes-titulo {
+    font-size: 0.72rem !important;
+    line-height: 1.06 !important;
+  }
+
+  .quant-mes-tag {
+    font-size: 0.58rem !important;
+    padding: 2px 4px !important;
+    line-height: 1.06 !important;
+  }
+
+  .quant-mes-valor {
+    font-size: 0.78rem !important;
+    margin-bottom: 1px !important;
+    line-height: 1.05 !important;
+  }
+
+  .quant-mes-subtitulo,
+  .linha-mini span,
+  .linha-mini strong {
+    font-size: 0.59rem !important;
+    line-height: 1.1 !important;
+  }
+
+  .quant-mes-subtitulo {
+    margin-bottom: 4px !important;
+  }
+
+  .linha-mini {
+    padding: 2px 0 !important;
+    gap: 4px !important;
+  }
+
+  .meses-grid-quant2 .quant-mes-card:nth-child(5),
+  .meses-grid-quant2 .quant-mes-card:nth-child(7),
+  .meses-grid-quant2 .quant-mes-card:nth-child(9),
+  .meses-grid-quant2 .quant-mes-card:nth-child(11) {
+    clear: none !important;
+    break-before: auto !important;
+    page-break-before: auto !important;
+  }
 }
