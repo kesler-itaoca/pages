@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Login - Itaoca</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="auth-itaoca.js"></script>
+  <style>
+    .login-wrap {
+      max-width: 560px;
+      margin: 36px auto;
+    }
+    .login-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+    .login-actions > * {
+      flex: 1 1 180px;
+    }
+    .login-erro {
+      color: #b91c1c;
+      margin-top: 12px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header class="header-itaoca">
+    <img
+      src="https://yata-apix-26d89c64-255e-44a8-a7e2-98a7a639f851.s3-object.locaweb.com.br/b057cb744b064181a08c9d4ce88202bf.jpg"
+      alt="Logo Itaoca"
+      class="logo-itaoca"
+    />
+    <div class="header-text">
+      <h1>Acesso interno</h1>
+    </div>
+  </header>
+
+  <div class="header-gold-line"></div>
+
+  <main class="wrap login-wrap">
+    <section class="card">
+      <h2 class="section-title">Entrar</h2>
+      <p class="small-muted">Acesso à análise interna da Itaoca.</p>
+
+      <div class="form-grid">
+        <div class="field">
+          <label for="loginInput">Login</label>
+          <input id="loginInput" type="text" autocomplete="username" placeholder="Seu login" />
+        </div>
+
+        <div class="field">
+          <label for="senhaInput">Senha</label>
+          <input id="senhaInput" type="password" autocomplete="current-password" placeholder="Sua senha" />
+        </div>
+      </div>
+
+      <div class="login-actions">
+        <button type="button" class="btn-primary" id="btnEntrar">Entrar</button>
+        <a href="index.html" class="btn-secondary">Voltar para a página pública</a>
+      </div>
+
+      <p id="loginErro" class="login-erro">Login ou senha inválidos.</p>
+    </section>
+  </main>
+
+  <script>
+  document.addEventListener('DOMContentLoaded', function () {
+    if (estaAutenticadoItaoca()) {
+      window.location.href = `index-2.html?from=login&ts=${Date.now()}`;
+      return;
+    }
+
+    const loginInput = document.getElementById('loginInput');
+    const senhaInput = document.getElementById('senhaInput');
+    const btnEntrar = document.getElementById('btnEntrar');
+    const erro = document.getElementById('loginErro');
+
+    function fazerLogin() {
+      erro.style.display = 'none';
+      const sessao = autenticarItaoca(loginInput.value, senhaInput.value);
+
+      if (!sessao) {
+        erro.style.display = 'block';
+        senhaInput.value = '';
+        senhaInput.focus();
+        return;
+      }
+
+      window.location.href = `index-2.html?from=login&ts=${Date.now()}`;
+    }
+
+    btnEntrar.addEventListener('click', fazerLogin);
+    loginInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') fazerLogin();
+    });
+    senhaInput.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter') fazerLogin();
+    });
+  });
+</script>
+</body>
+</html>

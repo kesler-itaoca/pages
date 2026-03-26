@@ -8,6 +8,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="index-2.css" />
+  <script src="auth-itaoca.js"></script>
 <style>
 .field-disabled input,
 .field-disabled select,
@@ -36,10 +37,35 @@
   <div class="header-gold-line"></div>
 
   <div class="wrap">
-    <div class="top-switch">
-      <a href="index.html" class="btn-secondary">Voltar para modelo simples</a>
-      
+    <div class="top-toolbar">
+  <div class="top-toolbar__left">
+    <a href="index.html" class="btn-secondary top-toolbar__back">
+      Voltar para modelo simples
+    </a>
+  </div>
+
+  <div class="top-toolbar__right">
+    <div class="user-chip">
+      <span class="user-chip__label">Usuário</span>
+      <strong class="user-chip__name" id="authUserName">-</strong>
     </div>
+
+    <label for="inputImportarJson" class="btn-secondary top-toolbar__btn">
+      Importar JSON
+    </label>
+
+    <button type="button" class="btn-secondary top-toolbar__btn" id="btnExportarJson">
+      Exportar JSON
+    </button>
+        <button type="button" class="btn-primary" id="btnAbrirQuant2" onclick="abrirQuant2()">Análise ISI</button>
+		<button type="button" class="btn-secondary" id="btnLimparIndex2">Limpar dados</button>
+        <button type="button" class="btn-secondary top-toolbar__btn top-toolbar__btn--logout" id="btnLogoutIndex2">
+      Sair
+    </button>
+  </div>
+</div>
+
+<input type="file" id="inputImportarJson" accept=".json" hidden>
   </div>
 
   
@@ -489,8 +515,7 @@
       </div>
 
       <div class="actions-row actions-row-2">
-        <button type="button" class="btn-secondary" id="btnLimparIndex2">Limpar dados</button>
-        <button type="button" class="btn-primary" id="btnAbrirQuant2">Análise ISI</button>
+        <button type="button" class="btn-primary" id="btnAbrirQuant2" onclick="abrirQuant2()">Análise ISI</button>
       </div>
     </section>
 
@@ -576,6 +601,7 @@
   
   <script>
   const STORAGE_KEY_QUANT_V2 = "itaocaQuantPayloadV2";
+  const STORAGEKEYQUANTV2 = 'itaocaQuantPayloadV2';
 
   const PLANOS = {
     "2000": {
@@ -1186,102 +1212,383 @@
     };
   }
 
-  function abrirQuant2(){
-    const payload = coletarPayload();
-    sessionStorage.setItem(STORAGE_KEY_QUANT_V2, JSON.stringify(payload));
-    window.open("quant-2.html", "_blank");
+const INDEX2_IMPORT_MAP = {
+  deal: {
+    dataAnalise: 'dataAnalise',
+    analistaResponsavel: 'analistaResponsavel',
+    tituloDeal: 'tituloDeal',
+    cidadeUf: 'cidadeUf',
+    bairro: 'bairro',
+    tipoImovel: 'tipoImovel',
+    metragem: 'metragem',
+    origemOportunidade: 'origemOportunidade',
+    matriculaNumero: 'matriculaNumero',
+    comarcaRegistro: 'comarcaRegistro',
+    linkMatricula: 'linkMatricula',
+    linkEdital: 'linkEdital',
+    tipoPrazoEdital: 'tipoPrazoEdital',
+    dataPrazoEdital: 'dataPrazoEdital',
+    lanceMinimoEdital: 'lanceMinimoEdital',
+    valorAvaliacaoEdital: 'valorAvaliacaoEdital'
+  },
+  operacao: {
+    valorAquisicao: 'valorAquisicao2',
+    valorVenda: 'valorVenda2',
+    tipoPagamento: 'tipoPagamento2',
+    estrategiaSaida: 'estrategiaSaida',
+    prazoSaidaMeses: 'prazoSaidaMeses',
+    plano: 'plano2',
+    percAssessoria: 'percAssessoria2',
+    valorAssessoria: 'valorAssessoria2',
+    documentacaoPerc: 'documentacaoPerc2',
+    documentacao: 'documentacao2',
+    leiloeiroPerc: 'leiloeiroPerc2',
+    leiloeiro: 'leiloeiro2',
+    corretorPerc: 'corretorPerc2',
+    corretor: 'corretor2',
+    dividas: 'dividas2',
+    reforma: 'reforma2',
+    honorarios: 'honorarios2',
+    condMensal: 'condMensal2',
+    iptuMensal: 'iptuMensal2'
+  },
+  financiamento: {
+    entradaPerc: 'entradaPerc2',
+    entradaValor: 'entradaValor2',
+    jurosAnual: 'jurosAnual2',
+    prazoFinanciamento: 'prazoFinanciamento2',
+    sistema: 'sistema2',
+    valorFinanciado: 'valorFinanciado2',
+    parcelaEstimativa: 'parcelaEstimativa2',
+    totalPagoAteSaida: 'totalPagoAteSaida2'
+  },
+  juridico: {
+    ocupado: 'ocupado',
+    quemOcupa: 'quemOcupa',
+    matriculaLimpa: 'matriculaLimpa',
+    onusReais: 'onusReais',
+    editalOk: 'editalOk',
+    necessitaImissao: 'necessitaImissao',
+    haProcessos: 'haProcessos',
+    complexidadeJuridica: 'complexidadeJuridica',
+    numerosProcessos: 'numerosProcessos'
+  },
+  mercado: {
+    valorMercado: 'valorMercado',
+    liquidezRegiao: 'liquidezRegiao',
+    vacanciaRegiao: 'vacanciaRegiao',
+    riscoReforma: 'riscoReforma',
+    benchmarkCdi: 'benchmarkCdi',
+    linkComparaveis1: 'linkComparaveis1',
+    linkComparaveis2: 'linkComparaveis2',
+    linkComparaveis3: 'linkComparaveis3',
+    observacoesAnalista: 'observacoesAnalista'
   }
+};
 
-  function limparIndex2(){
-    const ids = [
-      "dataAnalise","analistaResponsavel",
-      "tituloDeal","cidadeUf","bairro","tipoImovel","metragem","origemOportunidade","matriculaNumero","comarcaRegistro",
-      "linkMatricula","linkEdital","tipoPrazoEdital","dataPrazoEdital","lanceMinimoEdital","valorAvaliacaoEdital",
-      "valorAquisicao2","valorVenda2","tipoPagamento2","estrategiaSaida","prazoSaidaMeses","plano2","percAssessoria2","valorAssessoria2",
-      "documentacaoPerc2","documentacao2","leiloeiroPerc2","leiloeiro2","corretorPerc2","corretor2","dividas2","reforma2",
-      "honorarios2","condMensal2","iptuMensal2","entradaPerc2","entradaValor2","jurosAnual2","prazoFinanciamento2",
-      "sistema2","valorFinanciado2","parcelaEstimativa2","totalPagoAteSaida2","ocupado","quemOcupa","matriculaLimpa","onusReais",
-      "editalOk","necessitaImissao","haProcessos","complexidadeJuridica","numerosProcessos","valorMercado","liquidezRegiao",
-      "vacanciaRegiao","riscoReforma","benchmarkCdi","linkComparaveis1","linkComparaveis2","linkComparaveis3","observacoesAnalista"
-    ];
+function aplicarPayloadNoFormulario(payload) {
+  if (!payload || typeof payload !== 'object') return;
 
-    ids.forEach(id => {
-      const el = getEl(id);
-      if(!el) return;
-
-      if(el.tagName === "SELECT"){
-        el.selectedIndex = 0;
-      } else {
-        el.value = "";
+  Object.entries(INDEX2_IMPORT_MAP).forEach(([grupo, mapa]) => {
+    const origem = payload[grupo] || {};
+    Object.entries(mapa).forEach(([chave, id]) => {
+      if (origem[chave] !== undefined) {
+        setValue(id, origem[chave]);
       }
     });
+  });
 
-    setValue("dataAnalise", hojeISO());
-    setValue("tipoPagamento2", "À vista");
-    setValue("sistema2", "SAC");
-    setText("resumoSaldoDevedor2", fmtBRL(0));
+  if (!getValue('dataAnalise')) setValue('dataAnalise', hojeISO());
+  handleTipoPagamentoChangeIndex2();
+  aplicarPlano2();
+  atualizarPainel();
+}
 
-    handleTipoPagamentoChangeIndex2();
+function nomeArquivoSeguro(texto) {
+  return String(texto || 'analise-isi')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '') || 'analise-isi';
+}
+
+function exportarJsonIndex2() {
+  const payload = coletarPayload();
+  const sessao = obterSessaoItaoca();
+
+  payload.meta = {
+    ...(payload.meta || {}),
+    exportadoEm: new Date().toISOString(),
+    exportadoPor: sessao?.nome || ''
+  };
+
+  const titulo = payload?.deal?.tituloDeal || 'analise-isi';
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+
+  a.href = url;
+  a.download = `${nomeArquivoSeguro(titulo)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+}
+
+function importarJsonIndex2(event) {
+  const file = event.target.files?.[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+
+  reader.onload = function () {
+    try {
+      const payload = JSON.parse(reader.result);
+      aplicarPayloadNoFormulario(payload);
+      sessionStorage.setItem(STORAGEKEYQUANTV2, JSON.stringify(payload));
+    } catch (err) {
+      alert('Não foi possível importar o arquivo JSON.');
+    } finally {
+      event.target.value = '';
+    }
+  };
+
+  reader.readAsText(file, 'utf-8');
+}
+
+
+  function abrirQuant2() {
+  const payload = coletarPayload();
+  sessionStorage.setItem(STORAGEKEYQUANTV2, JSON.stringify(payload));
+  window.location.href = 'quant-2.html';
+}
+
+  function limparIndex2() {
+  const ids = [
+    'dataAnalise','analistaResponsavel',
+    'tituloDeal','cidadeUf','bairro','tipoImovel','metragem','origemOportunidade',
+    'matriculaNumero','comarcaRegistro','linkMatricula','linkEdital',
+    'tipoPrazoEdital','dataPrazoEdital','lanceMinimoEdital','valorAvaliacaoEdital',
+    'valorAquisicao2','valorVenda2','tipoPagamento2','estrategiaSaida','prazoSaidaMeses',
+    'plano2','percAssessoria2','valorAssessoria2','documentacaoPerc2','documentacao2',
+    'leiloeiroPerc2','leiloeiro2','corretorPerc2','corretor2','dividas2','reforma2',
+    'honorarios2','condMensal2','iptuMensal2','entradaPerc2','entradaValor2',
+    'jurosAnual2','prazoFinanciamento2','sistema2','valorFinanciado2',
+    'parcelaEstimativa2','totalPagoAteSaida2','ocupado','quemOcupa','matriculaLimpa',
+    'onusReais','editalOk','necessitaImissao','haProcessos','complexidadeJuridica',
+    'numerosProcessos','valorMercado','liquidezRegiao','vacanciaRegiao','riscoReforma',
+    'benchmarkCdi','linkComparaveis1','linkComparaveis2','linkComparaveis3',
+    'observacoesAnalista'
+  ];
+
+  ids.forEach(id => {
+    const el = getEl(id);
+    if (!el) return;
+    if (el.tagName === 'SELECT') el.selectedIndex = 0;
+    else el.value = '';
+  });
+
+  setValue('dataAnalise', hojeISO());
+  setValue('tipoPagamento2', 'avista');
+  setValue('sistema2', 'SAC');
+  setText('resumoSaldoDevedor2', fmtBRL(0));
+
+  const sessao = obterSessaoItaoca();
+  if (sessao?.nome) setValue('analistaResponsavel', sessao.nome);
+
+  sessionStorage.removeItem(STORAGEKEYQUANTV2);
+  handleTipoPagamentoChangeIndex2();
+  aplicarPlano2();
+  atualizarPainel();
+}
+
+function getPayloadSalvoIndex2() {
+  try {
+    const bruto = sessionStorage.getItem('itaocaQuantPayloadV2');
+    return bruto ? JSON.parse(bruto) : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function preencherIndex2ComPayload(payload) {
+  if (!payload) return;
+
+  const deal = payload.deal || {};
+  const operacao = payload.operacao || {};
+  const financiamento = payload.financiamento || {};
+  const juridico = payload.juridico || {};
+  const mercado = payload.mercado || {};
+
+  setValue('dataAnalise', deal.dataAnalise || '');
+  setValue('analistaResponsavel', deal.analistaResponsavel || '');
+  setValue('tituloDeal', deal.tituloDeal || '');
+  setValue('cidadeUf', deal.cidadeUf || '');
+  setValue('bairro', deal.bairro || '');
+  setValue('tipoImovel', deal.tipoImovel || '');
+  setValue('metragem', deal.metragem || '');
+  setValue('origemOportunidade', deal.origemOportunidade || '');
+  setValue('matriculaNumero', deal.matriculaNumero || '');
+  setValue('comarcaRegistro', deal.comarcaRegistro || '');
+  setValue('linkMatricula', deal.linkMatricula || '');
+  setValue('linkEdital', deal.linkEdital || '');
+  setValue('tipoPrazoEdital', deal.tipoPrazoEdital || '');
+  setValue('dataPrazoEdital', deal.dataPrazoEdital || '');
+  setValue('lanceMinimoEdital', deal.lanceMinimoEdital || '');
+  setValue('valorAvaliacaoEdital', deal.valorAvaliacaoEdital || '');
+
+  setValue('valorAquisicao2', operacao.valorAquisicao || '');
+  setValue('valorVenda2', operacao.valorVenda || '');
+  setValue('tipoPagamento2', operacao.tipoPagamento || 'À vista');
+  setValue('estrategiaSaida', operacao.estrategiaSaida || '');
+  setValue('prazoSaidaMeses', operacao.prazoSaidaMeses || '');
+  setValue('plano2', operacao.plano || '0');
+  setValue('percAssessoria2', operacao.percAssessoria || '');
+  setValue('valorAssessoria2', operacao.valorAssessoria || '');
+  setValue('documentacaoPerc2', operacao.documentacaoPerc || '');
+  setValue('documentacao2', operacao.documentacao || '');
+  setValue('leiloeiroPerc2', operacao.leiloeiroPerc || '');
+  setValue('leiloeiro2', operacao.leiloeiro || '');
+  setValue('corretorPerc2', operacao.corretorPerc || '');
+  setValue('corretor2', operacao.corretor || '');
+  setValue('dividas2', operacao.dividas || '');
+  setValue('reforma2', operacao.reforma || '');
+  setValue('honorarios2', operacao.honorarios || '');
+  setValue('condMensal2', operacao.condMensal || '');
+  setValue('iptuMensal2', operacao.iptuMensal || '');
+
+  setValue('entradaPerc2', financiamento.entradaPerc || '');
+  setValue('entradaValor2', financiamento.entradaValor || '');
+  setValue('jurosAnual2', financiamento.jurosAnual || '');
+  setValue('prazoFinanciamento2', financiamento.prazoFinanciamento || '');
+  setValue('sistema2', financiamento.sistema || 'SAC');
+  setValue('valorFinanciado2', financiamento.valorFinanciado || '');
+  setValue('parcelaEstimativa2', financiamento.parcelaEstimativa || '');
+  setValue('totalPagoAteSaida2', financiamento.totalPagoAteSaida || '');
+
+  setValue('ocupado', juridico.ocupado || '');
+  setValue('quemOcupa', juridico.quemOcupa || '');
+  setValue('matriculaLimpa', juridico.matriculaLimpa || '');
+  setValue('onusReais', juridico.onusReais || '');
+  setValue('editalOk', juridico.editalOk || '');
+  setValue('necessitaImissao', juridico.necessitaImissao || '');
+  setValue('haProcessos', juridico.haProcessos || '');
+  setValue('complexidadeJuridica', juridico.complexidadeJuridica || '');
+  setValue('numerosProcessos', juridico.numerosProcessos || '');
+
+  setValue('valorMercado', mercado.valorMercado || '');
+  setValue('liquidezRegiao', mercado.liquidezRegiao || '');
+  setValue('vacanciaRegiao', mercado.vacanciaRegiao || '');
+  setValue('riscoReforma', mercado.riscoReforma || '');
+  setValue('benchmarkCdi', mercado.benchmarkCdi || '');
+  setValue('linkComparaveis1', mercado.linkComparaveis1 || '');
+  setValue('linkComparaveis2', mercado.linkComparaveis2 || '');
+  setValue('linkComparaveis3', mercado.linkComparaveis3 || '');
+  setValue('observacoesAnalista', mercado.observacoesAnalista || '');
+
+  handleTipoPagamentoChangeIndex2();
+  atualizarPainel();
+}
+
+  document.addEventListener('DOMContentLoaded', function () {
+  if (!exigirLoginItaoca()) return;
+
+  preencherUsuarioLogado(['authUserName']);
+
+  ensureSaldoResumoIndex2();
+
+  const dataEl = getEl('dataAnalise');
+  if (dataEl && !dataEl.value) dataEl.value = hojeISO();
+
+  const sessao = obterSessaoItaoca();
+  if (sessao?.nome && !getValue('analistaResponsavel')) {
+    setValue('analistaResponsavel', sessao.nome);
   }
 
-  document.addEventListener("DOMContentLoaded", function(){
-    ensureSaldoResumoIndex2();
+  attachCurrencyFormatting([
+    'valorAquisicao2','valorVenda2','dividas2','reforma2','honorarios2',
+    'condMensal2','iptuMensal2','valorMercado','lanceMinimoEdital','valorAvaliacaoEdital'
+  ]);
 
-    const dataEl = getEl("dataAnalise");
-    if(dataEl && !dataEl.value){
-      dataEl.value = hojeISO();
-    }
+  [
+    'dataAnalise','analistaResponsavel',
+    'valorAquisicao2','valorVenda2','estrategiaSaida','prazoSaidaMeses','percAssessoria2',
+    'documentacaoPerc2','leiloeiroPerc2','corretorPerc2','dividas2','reforma2',
+    'honorarios2','condMensal2','iptuMensal2','entradaPerc2','jurosAnual2',
+    'prazoFinanciamento2','sistema2','ocupado','quemOcupa','matriculaLimpa',
+    'onusReais','editalOk','necessitaImissao','haProcessos','complexidadeJuridica',
+    'valorMercado','liquidezRegiao','vacanciaRegiao','riscoReforma','benchmarkCdi',
+    'tituloDeal','cidadeUf','bairro','tipoImovel','metragem','origemOportunidade',
+    'matriculaNumero','comarcaRegistro','numerosProcessos','observacoesAnalista',
+    'linkMatricula','linkEdital','tipoPrazoEdital','dataPrazoEdital',
+    'lanceMinimoEdital','valorAvaliacaoEdital',
+    'linkComparaveis1','linkComparaveis2','linkComparaveis3'
+  ].forEach(id => {
+    const el = getEl(id);
+    if (!el) return;
+    el.addEventListener('input', atualizarPainel);
+    el.addEventListener('change', atualizarPainel);
+  });
 
-    attachCurrencyFormatting([
-      "valorAquisicao2","valorVenda2","dividas2","reforma2","honorarios2","condMensal2","iptuMensal2","valorMercado",
-      "lanceMinimoEdital","valorAvaliacaoEdital"
-    ]);
+  const tipoPagamentoEl = getEl('tipoPagamento2');
+  if (tipoPagamentoEl) {
+    tipoPagamentoEl.addEventListener('change', handleTipoPagamentoChangeIndex2);
+  }
 
-    [
-      "dataAnalise","analistaResponsavel",
-      "valorAquisicao2","valorVenda2","estrategiaSaida","prazoSaidaMeses","percAssessoria2",
-      "documentacaoPerc2","leiloeiroPerc2","corretorPerc2","dividas2","reforma2","honorarios2","condMensal2","iptuMensal2",
-      "entradaPerc2","jurosAnual2","prazoFinanciamento2","sistema2","ocupado","quemOcupa","matriculaLimpa",
-      "onusReais","editalOk","necessitaImissao","haProcessos","complexidadeJuridica","valorMercado",
-      "liquidezRegiao","vacanciaRegiao","riscoReforma","benchmarkCdi","tituloDeal","cidadeUf","bairro","tipoImovel",
-      "metragem","origemOportunidade","matriculaNumero","comarcaRegistro","numerosProcessos","observacoesAnalista",
-      "linkMatricula","linkEdital","tipoPrazoEdital","dataPrazoEdital","lanceMinimoEdital","valorAvaliacaoEdital",
-      "linkComparaveis1","linkComparaveis2","linkComparaveis3"
-    ].forEach(id => {
-      const el = getEl(id);
-      if(!el) return;
-      el.addEventListener("input", atualizarPainel);
-      el.addEventListener("change", atualizarPainel);
+  const planoEl = getEl('plano2');
+  if (planoEl) {
+    planoEl.addEventListener('change', aplicarPlano2);
+  }
+
+  const entradaPercEl = getEl('entradaPerc2');
+  if (entradaPercEl) {
+    entradaPercEl.addEventListener('blur', normalizarEntradaPerc2);
+  }
+
+  const btnAbrir = getEl('btnAbrirQuant2');
+  if (btnAbrir) {
+    btnAbrir.addEventListener('click', abrirQuant2);
+  }
+
+  const btnLimpar = getEl('btnLimparIndex2');
+  if (btnLimpar) {
+    btnLimpar.addEventListener('click', limparIndex2);
+  }
+
+  const btnExportar = getEl('btnExportarJson');
+  if (btnExportar) {
+    btnExportar.addEventListener('click', exportarJsonIndex2);
+  }
+
+  const inputImportar = getEl('inputImportarJson');
+  if (inputImportar) {
+    inputImportar.addEventListener('change', importarJsonIndex2);
+  }
+
+  const btnLogout = getEl('btnLogoutIndex2');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', function () {
+      sairItaoca('login.html');
     });
+  }
 
-    const tipoPagamentoEl = getEl("tipoPagamento2");
-    if(tipoPagamentoEl){
-      tipoPagamentoEl.addEventListener("change", handleTipoPagamentoChangeIndex2);
+  const payloadSalvo = getPayloadSalvoIndex2();
+
+  if (payloadSalvo) {
+    preencherIndex2ComPayload(payloadSalvo);
+
+    if (sessao?.nome && !getValue('analistaResponsavel')) {
+      setValue('analistaResponsavel', sessao.nome);
     }
 
-    const planoEl = getEl("plano2");
-    if(planoEl){
-      planoEl.addEventListener("change", aplicarPlano2);
-    }
-
-    const entradaPercEl = getEl("entradaPerc2");
-    if(entradaPercEl){
-      entradaPercEl.addEventListener("blur", normalizarEntradaPerc2);
-    }
-
-    const btnAbrir = getEl("btnAbrirQuant2");
-    if(btnAbrir){
-      btnAbrir.addEventListener("click", abrirQuant2);
-    }
-
-    const btnLimpar = getEl("btnLimparIndex2");
-    if(btnLimpar){
-      btnLimpar.addEventListener("click", limparIndex2);
-    }
-
+    atualizarPainel();
+  } else {
     handleTipoPagamentoChangeIndex2();
     aplicarPlano2();
-  });
+    atualizarPainel();
+  }
+});
+
 </script>
 
 

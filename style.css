@@ -1222,3 +1222,253 @@ select:hover {
     display: none !important;
   }
 }
+
+.top-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+  padding: 16px 18px;
+  background: var(--branco);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+}
+
+.top-toolbar__left,
+.top-toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.top-toolbar__right {
+  margin-left: auto;
+  justify-content: flex-end;
+}
+
+.top-toolbar__back,
+.top-toolbar__btn {
+  min-height: 46px;
+  padding: 0 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.user-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 46px;
+  padding: 0 16px;
+  background: rgba(27, 58, 60, 0.05);
+  border: 1px solid rgba(27, 58, 60, 0.12);
+  border-radius: 999px;
+  color: var(--verde-itaoca);
+}
+
+.user-chip__label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--cinza-texto);
+}
+
+.user-chip__name {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: var(--verde-itaoca);
+}
+
+.top-toolbar__btn--logout {
+  border-color: rgba(185, 28, 28, 0.18);
+  color: #991b1b;
+}
+
+.top-toolbar__btn--logout:hover {
+  background: rgba(185, 28, 28, 0.06);
+  border-color: rgba(185, 28, 28, 0.28);
+}
+
+@media (max-width: 980px) {
+  .top-toolbar {
+    align-items: stretch;
+  }
+
+  .top-toolbar__left,
+  .top-toolbar__right {
+    width: 100%;
+  }
+
+  .top-toolbar__right {
+    margin-left: 0;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 760px) {
+  .top-toolbar {
+    padding: 14px;
+  }
+
+  .top-toolbar__left,
+  .top-toolbar__right {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .top-toolbar__back,
+  .top-toolbar__btn,
+  .user-chip {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .user-chip {
+    justify-content: space-between;
+    border-radius: 12px;
+    padding: 12px 14px;
+  }
+}
+
+@media print {
+  .top-toolbar {
+    display: none !important;
+  }
+}
+
+/* =========================================================
+   LOGIN.HTML
+   Adicionar no final do style.css
+   ========================================================= */
+
+/* Garante que o campo de senha tenha o mesmo visual dos demais */
+input[type="text"],
+input[type="number"],
+input[type="password"],
+select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(27,58,60,0.12);
+  font-size: clamp(0.9rem, 0.86rem + 0.15vw, 0.95rem);
+  color: var(--verde-itaoca);
+  background: var(--branco);
+  transition: 0.2s;
+  min-height: 44px;
+  min-width: 0;
+  box-shadow: none;
+}
+
+input[type="text"]:hover,
+input[type="number"]:hover,
+input[type="password"]:hover,
+select:hover {
+  border-color: rgba(166,130,61,0.45);
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+input[type="password"]:focus,
+select:focus {
+  border-color: var(--dourado-itaoca);
+  box-shadow: 0 0 0 2px rgba(166,130,61,0.25);
+  outline: none;
+}
+
+/* Área principal da página de login */
+.login-wrap {
+  max-width: 560px;
+  margin: 36px auto;
+}
+
+/* Card do login com acabamento um pouco mais refinado */
+.login-wrap .card {
+  padding: clamp(20px, 2.2vw, 30px);
+}
+
+/* Texto auxiliar abaixo do título */
+.login-wrap .small-muted {
+  margin-top: -4px;
+  margin-bottom: 20px;
+}
+
+/* Botões / links de ação */
+.login-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 18px;
+}
+
+.login-actions > * {
+  flex: 1 1 180px;
+}
+
+.login-actions .btn-primary,
+.login-actions .btn-secondary {
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  text-decoration: none;
+}
+
+/* Mensagem de erro */
+.login-erro {
+  color: var(--vermelho-soft);
+  margin-top: 12px;
+  display: none;
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+/* Melhor leitura dos campos dentro do card */
+.login-wrap .field label {
+  margin-bottom: 6px;
+}
+
+.login-wrap .form-grid {
+  margin-bottom: 0;
+}
+
+/* Estado visual ao focar no card inteiro via interação */
+.login-wrap .card:has(input:focus) {
+  border-color: rgba(166,130,61,0.18);
+  box-shadow:
+    0 8px 22px rgba(0,0,0,0.08),
+    0 0 0 1px rgba(166,130,61,0.10);
+}
+
+/* Responsivo tablet/mobile */
+@media (max-width: 760px) {
+  .login-wrap {
+    margin: 20px auto;
+  }
+
+  .login-actions {
+    gap: 10px;
+  }
+
+  .login-actions > * {
+    flex: 1 1 100%;
+  }
+
+  .login-actions .btn-primary,
+  .login-actions .btn-secondary {
+    width: 100%;
+  }
+}
+
+/* Mobile pequeno */
+@media (max-width: 420px) {
+  .login-wrap .card {
+    padding: 16px;
+  }
+}
