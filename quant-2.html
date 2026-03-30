@@ -230,33 +230,41 @@
   </section>
 
   <section class="card card-plano">
-    <h2 class="section-title">Plano contratado</h2>
+  <h2 class="section-title">Plano contratado</h2>
+  <div class="stat">
+    <span class="label">Plano</span>
+    <span class="value" id="planoNome"></span>
+  </div>
+  <div class="stat">
+    <span class="label">Taxa nominal do plano</span>
+    <span class="value" id="planoValor">R$ 0,00</span>
+  </div>
+  <div class="stat">
+    <span class="label">Critério nesta análise</span>
+    <span class="value" id="planoRateio">Padrão (100%)</span>
+  </div>
+  <div class="stat">
+    <span class="label">% do fee nesta análise</span>
+    <span class="value" id="planoRateioPerc">—</span>
+  </div>
+  <div class="stat">
+    <span class="label">Custo do plano considerado</span>
+    <span class="value" id="planoCusto">R$ 0,00</span>
+  </div>
+  <div class="stat">
+    <span class="label">Assessoria sobre aquisição</span>
+    <span class="value" id="planoAssessoriaPerc">0,00%</span>
+  </div>
+  <div class="stat">
+    <span class="label">Valor da assessoria</span>
+    <span class="value" id="planoAssessoriaValor">R$ 0,00</span>
+  </div>
+  <div class="stat">
+    <span class="label">Plano considerado + assessoria</span>
+    <span class="value" id="planoTotal">R$ 0,00</span>
+  </div>
+</section>
 
-    <div class="stat">
-      <span class="label">Plano</span>
-      <span class="value" id="planoNome">—</span>
-    </div>
-
-    <div class="stat">
-      <span class="label">Taxa do plano</span>
-      <span class="value" id="planoValor">R$ 0,00</span>
-    </div>
-
-    <div class="stat">
-      <span class="label">Assessoria sobre aquisição</span>
-      <span class="value" id="planoAssessoriaPerc">0,00 %</span>
-    </div>
-
-    <div class="stat">
-      <span class="label">Valor da assessoria</span>
-      <span class="value" id="planoAssessoriaValor">R$ 0,00</span>
-    </div>
-
-    <div class="stat">
-      <span class="label">Plano + assessoria</span>
-      <span class="value" id="planoTotal">R$ 0,00</span>
-    </div>
-  </section>
 </div>
 
   <div class="quant2-grid">
@@ -700,15 +708,20 @@ function obterNomePlano(valor) {
   return mapa[Math.round(Number(valor || 0))] || 'Não informado';
 }
 
-function renderPlanoContratado(payload, operacional) {
+function renderPlanoContratado(payload, operacional){
   const planoValor = Number(operacional.plano || 0);
-  const percAssessoria = parseFloat(get(payload, 'operacao.percAssessoria', 0)) || 0;
+  const percAssessoria = parseFloat(get(payload, "operacao.percAssessoria", 0)) || 0;
+  const rateio = operacional.ratioPlano || "inteiro";
+  const percRateio = parseFloat(operacional.percRatioPlano || 0) || 0;
 
-  setText('planoNome', planoValor > 0 ? obterNomePlano(planoValor) : 'Não informado');
-  setText('planoValor', fmtBRL(planoValor));
-  setText('planoAssessoriaPerc', fmtPercent(percAssessoria));
-  setText('planoAssessoriaValor', fmtBRL(operacional.valorAssessoria));
-  setText('planoTotal', fmtBRL(operacional.planoAssessoria));
+  setText("planoNome", planoValor > 0 ? obterNomePlano(planoValor) : "No informado");
+  setText("planoValor", fmtBRL(planoValor));
+  setText("planoRateio", getRotuloRateioPlano(rateio));
+  setText("planoRateioPerc", rateio === "percentual" ? fmtPercent(percRateio) : "—");
+  setText("planoCusto", fmtBRL(operacional.custoPlano));
+  setText("planoAssessoriaPerc", fmtPercent(percAssessoria));
+  setText("planoAssessoriaValor", fmtBRL(operacional.valorAssessoria));
+  setText("planoTotal", fmtBRL(operacional.planoAssessoria));
 }
 
   function obterCorretagem(operacao, valorVenda){
@@ -717,123 +730,143 @@ function renderPlanoContratado(payload, operacional) {
     return perc > 0 ? valorVenda * (perc / 100) : corretor;
   }
 
-  function calcularOperacional(payload, prazoMeses = null, valorVendaAtual = null){
-    const { operacao, financiamento } = payload;
+function getRotuloRateioPlano(valor){
+  const v = String(valor || "inteiro").trim().toLowerCase();
+  if(v === "dividido") return "Dividido entre arrematações";
+  if(v === "percentual") return "Percentual do fee";
+  if(v === "quitado") return "Desconsiderado";
+  return "Padrão (100%)";
+}
 
-    const valorAquisicao = parseCurrency(operacao.valorAquisicao);
-    const valorVenda = valorVendaAtual !== null ? valorVendaAtual : parseCurrency(operacao.valorVenda);
-    const tipoPagamento = normalizarTipoPagamento(operacao.tipoPagamento);
-    const plano = parseCurrency(operacao.plano);
-    const valorAssessoria = parseCurrency(operacao.valorAssessoria) || valorAquisicao * ((parseFloat(operacao.percAssessoria || 0) || 0) / 100);
+function calcularOperacional(payload, prazoMeses = null, valorVendaAtual = null){
+  const { operacao, financiamento } = payload;
 
-    const documentacao = parseCurrency(operacao.documentacao);
-    const leiloeiro = parseCurrency(operacao.leiloeiro);
-    const corretor = obterCorretagem(operacao, valorVenda);
-    const dividas = parseCurrency(operacao.dividas);
-    const reforma = parseCurrency(operacao.reforma);
-    const honorarios = parseCurrency(operacao.honorarios);
-    const condMensal = parseCurrency(operacao.condMensal);
-    const iptuMensal = parseCurrency(operacao.iptuMensal);
+  const valorAquisicao = parseCurrency(operacao.valorAquisicao);
+  const valorVenda = valorVendaAtual != null ? valorVendaAtual : parseCurrency(operacao.valorVenda);
+  const tipoPagamento = normalizarTipoPagamento(operacao.tipoPagamento);
 
-    const prazoSaida = Math.max(1, parseInt(operacao.prazoSaidaMeses || 12, 10) || 12);
-    const prazoConsiderado = prazoMeses !== null ? prazoMeses : prazoSaida;
+  const planoNominal = parseCurrency(operacao.plano);
+  const ratioPlano = operacao.ratioPlano || "inteiro";
+  const percRatioPlano = parseFloat(operacao.percRatioPlano || 0) || 0;
+  const custoPlano = parseCurrency(operacao.custoPlano);
 
-    const entradaValor = parseCurrency(financiamento.entradaValor) || valorAquisicao * ((parseFloat(financiamento.entradaPerc || 0) || 0) / 100);
-    const jurosAnual = parseFloat(financiamento.jurosAnual || 0) || 0;
-    const prazoFin = Math.max(0, parseInt(financiamento.prazoFinanciamento || 0, 10) || 0);
-    const sistema = financiamento.sistema || "SAC";
+  const valorAssessoria = parseCurrency(
+    operacao.valorAssessoria || (valorAquisicao * ((parseFloat(operacao.percAssessoria) || 0) / 100))
+  );
 
-    let valorFinanciado = 0;
-    let parcela = 0;
-    let totalPagoFinanciamentoAteVenda = 0;
-    let saldoDevedor = 0;
-    let principalPago = 0;
-    let jurosPagos = 0;
+  const documentacao = parseCurrency(operacao.documentacao);
+  const leiloeiro = parseCurrency(operacao.leiloeiro);
+  const corretor = obterCorretagem(operacao, valorVenda);
+  const dividas = parseCurrency(operacao.dividas);
+  const reforma = parseCurrency(operacao.reforma);
+  const honorarios = parseCurrency(operacao.honorarios);
+  const condMensal = parseCurrency(operacao.condMensal);
+  const iptuMensal = parseCurrency(operacao.iptuMensal);
 
-    if(tipoPagamento === "financiado" && valorAquisicao > 0 && prazoFin > 0){
-      valorFinanciado = Math.max(0, valorAquisicao - entradaValor);
+  const prazoSaida = Math.max(1, parseInt(operacao.prazoSaidaMeses || 12, 10) || 12);
+  const prazoConsiderado = prazoMeses != null ? prazoMeses : prazoSaida;
 
-      const fin = calcFinDetalhado(valorFinanciado, jurosAnual, prazoFin, prazoConsiderado, sistema);
+  const entradaValor = parseCurrency(
+    financiamento.entradaValor || (valorAquisicao * ((parseFloat(financiamento.entradaPerc) || 0) / 100))
+  );
+  const jurosAnual = parseFloat(financiamento.jurosAnual || 0) || 0;
+  const prazoFin = Math.max(0, parseInt(financiamento.prazoFinanciamento || 0, 10) || 0);
+  const sistema = financiamento.sistema || "SAC";
 
-      parcela = fin.parcela;
-      jurosPagos = fin.jurosAcum;
-      principalPago = fin.principalPago;
-      totalPagoFinanciamentoAteVenda = fin.jurosAcum + fin.principalPago;
-      saldoDevedor = fin.saldoDevedor;
-    }
+  let valorFinanciado = 0;
+  let parcela = 0;
+  let totalPagoFinanciamentoAteVenda = 0;
+  let saldoDevedor = 0;
+  let principalPago = 0;
+  let jurosPagos = 0;
 
-    const condTotal = condMensal * prazoConsiderado;
-    const iptuTotal = iptuMensal * prazoConsiderado;
-    const custosFixos = documentacao + dividas + reforma + honorarios + leiloeiro;
-    const custosTempo = condTotal + iptuTotal;
-    const planoAssessoria = plano + valorAssessoria;
+  if(tipoPagamento === "financiado" && valorAquisicao > 0 && prazoFin > 0){
+    valorFinanciado = Math.max(0, valorAquisicao - entradaValor);
 
-    let desembolso = 0;
+    const fin = calcFinDetalhado(valorFinanciado, jurosAnual, prazoFin, prazoConsiderado, sistema);
 
-    if(tipoPagamento === "avista"){
-      desembolso = valorAquisicao + custosFixos + custosTempo + planoAssessoria;
-    } else {
-      desembolso = entradaValor + totalPagoFinanciamentoAteVenda + custosFixos + custosTempo + planoAssessoria;
-    }
-
-    const valorVendaAposCorretagem = Math.max(0, valorVenda - corretor);
-    const caixaLiquidoVenda = tipoPagamento === "financiado"
-      ? Math.max(0, valorVendaAposCorretagem - saldoDevedor)
-      : valorVendaAposCorretagem;
-
-    const lucroOperacional = caixaLiquidoVenda - desembolso;
-    const roiOperacional = desembolso > 0 ? (lucroOperacional / desembolso) * 100 : 0;
-    const margemOperacional = valorVenda > 0 ? (lucroOperacional / valorVenda) * 100 : 0;
-
-    const percCorretor = parseFloat(operacao.corretorPerc || 0) || (valorVenda > 0 ? (corretor / valorVenda) * 100 : 0);
-    const divisor = 1 - (percCorretor / 100);
-    const precoMinimoVenda = divisor > 0
-      ? (desembolso + (tipoPagamento === "financiado" ? saldoDevedor : 0)) / divisor
-      : 0;
-
-    const folgaSobreMinimo = valorVenda - precoMinimoVenda;
-
-    return {
-      valorAquisicao,
-      valorVenda,
-      tipoPagamento,
-      prazoConsiderado,
-      plano,
-      valorAssessoria,
-      documentacao,
-      leiloeiro,
-      corretor,
-      dividas,
-      reforma,
-      honorarios,
-      condMensal,
-      iptuMensal,
-      entradaValor,
-      jurosAnual,
-      prazoFin,
-      sistema,
-      valorFinanciado,
-      parcela,
-      totalPagoFinanciamentoAteVenda,
-      saldoDevedor,
-      principalPago,
-      jurosPagos,
-      condTotal,
-      iptuTotal,
-      custosFixos,
-      custosTempo,
-      planoAssessoria,
-      desembolso,
-      valorVendaAposCorretagem,
-      caixaLiquidoVenda,
-      lucroOperacional,
-      roiOperacional,
-      margemOperacional,
-      precoMinimoVenda,
-      folgaSobreMinimo
-    };
+    parcela = fin.parcela;
+    jurosPagos = fin.jurosAcum;
+    principalPago = fin.principalPago;
+    totalPagoFinanciamentoAteVenda = fin.jurosAcum + fin.principalPago;
+    saldoDevedor = fin.saldoDevedor;
   }
 
+  const condTotal = condMensal * prazoConsiderado;
+  const iptuTotal = iptuMensal * prazoConsiderado;
+  const custosFixos = documentacao + dividas + reforma + honorarios + leiloeiro;
+  const custosTempo = condTotal + iptuTotal;
+  const planoAssessoria = custoPlano + valorAssessoria;
+
+  let desembolso = 0;
+
+  if(tipoPagamento === "avista"){
+    desembolso = valorAquisicao + custosFixos + custosTempo + planoAssessoria;
+  } else {
+    desembolso = entradaValor + totalPagoFinanciamentoAteVenda + custosFixos + custosTempo + planoAssessoria;
+  }
+
+  const valorVendaAposCorretagem = Math.max(0, valorVenda - corretor);
+  const caixaLiquidoVenda = tipoPagamento === "financiado"
+    ? Math.max(0, valorVendaAposCorretagem - saldoDevedor)
+    : valorVendaAposCorretagem;
+
+  const lucroOperacional = caixaLiquidoVenda - desembolso;
+  const roiOperacional = desembolso > 0 ? (lucroOperacional / desembolso) * 100 : 0;
+  const margemOperacional = valorVenda > 0 ? (lucroOperacional / valorVenda) * 100 : 0;
+
+  const percCorretor = parseFloat(operacao.corretorPerc || 0) || (valorVenda > 0 ? (corretor / valorVenda) * 100 : 0);
+  const divisor = 1 - (percCorretor / 100);
+  const precoMinimoVenda = divisor > 0
+    ? (desembolso + (tipoPagamento === "financiado" ? saldoDevedor : 0)) / divisor
+    : 0;
+
+  const folgaSobreMinimo = valorVenda - precoMinimoVenda;
+
+  return {
+    valorAquisicao,
+    valorVenda,
+    tipoPagamento,
+    prazoConsiderado,
+    plano: planoNominal,
+    ratioPlano,
+    percRatioPlano,
+    custoPlano,
+    valorAssessoria,
+    documentacao,
+    leiloeiro,
+    corretor,
+    dividas,
+    reforma,
+    honorarios,
+    condMensal,
+    iptuMensal,
+    entradaValor,
+    jurosAnual,
+    prazoFin,
+    sistema,
+    valorFinanciado,
+    parcela,
+    totalPagoFinanciamentoAteVenda,
+    saldoDevedor,
+    principalPago,
+    jurosPagos,
+    condTotal,
+    iptuTotal,
+    custosFixos,
+    custosTempo,
+    planoAssessoria,
+    desembolso,
+    valorVendaAposCorretagem,
+    caixaLiquidoVenda,
+    lucroOperacional,
+    roiOperacional,
+    margemOperacional,
+    precoMinimoVenda,
+    folgaSobreMinimo
+  };
+}
+  
   function calcularFiscal(payload, operacional, valorVendaAtual = null){
     const operacao = payload.operacao || {};
     const venda = valorVendaAtual !== null ? valorVendaAtual : operacional.valorVenda;
@@ -1066,6 +1099,23 @@ function renderPlanoContratado(payload, operacional) {
   function montarLeituras(payload, operacional, fiscal, veredito){
     const leituras = [];
     const recomendacao = [];
+	
+	if(operacional.plano > 0){
+  let leituraPlano = `O plano nominal contratado é ${fmtBRL(operacional.plano)}, com custo considerado de ${fmtBRL(operacional.custoPlano)} nesta análise.`;
+
+  if(operacional.ratioPlano === "dividido"){
+    leituraPlano += " O fee foi rateado pelo número máximo de arrematações do plano.";
+  } else if(operacional.ratioPlano === "percentual"){
+    leituraPlano += ` Foi considerado ${fmtPercent(operacional.percRatioPlano)} do fee nesta análise.`;
+  } else if(operacional.ratioPlano === "quitado"){
+    leituraPlano += " O fee foi desconsiderado por já estar quitado em outra operação.";
+  } else {
+    leituraPlano += " Foi considerado 100% do fee nesta análise.";
+  }
+
+  leituras.push(leituraPlano);
+}
+	
 
     if(fiscal.lucroPosIR >= 0){
       leituras.push(`O cenário fecha com ${fmtBRL(fiscal.lucroPosIR)} após IR.`);
