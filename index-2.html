@@ -236,7 +236,20 @@
               <option value="25000">Private - R$ 25.000,00</option>
             </select>
           </div>
+<div class="field" id="fieldRatioPlano2">
+  <label for="ratioPlano2">Rateio do plano</label>
+  <select id="ratioPlano2">
+    <option value="inteiro">Padrão (100%)</option>
+    <option value="dividido">Dividido (fee ÷ máx. de arrematações)</option>
+    <option value="percentual">Percentual do fee</option>
+    <option value="quitado">Desconsiderar (R$ 0)</option>
+  </select>
+</div>
 
+<div class="field field-disabled" id="fieldPercRatioPlano2">
+  <label for="percRatioPlano2">% do fee nesta análise</label>
+  <input id="percRatioPlano2" type="number" step="1" min="0" max="100" placeholder="Ex: 50">
+</div>
           <div class="field">
             <label for="percAssessoria2">Assessoria (%)</label>
             <input id="percAssessoria2" type="number" step="0.01" />
@@ -811,22 +824,116 @@
     return { jurosAcum, principalPago, parcela: primeiraParcela, saldoDevedor: saldo };
   }
 
-  function aplicarPlano2(){
-    const planoId = getValue("plano2", "0");
-    const cfg = PLANOS[planoId];
 
-    if(!cfg){
-      setValue("percAssessoria2", "");
-      atualizarPercentuaisIndex2();
-      atualizarPainel();
-      return;
-    }
+function getPercRatioPlano2Limitado(){
+    const el = getEl("percRatioPlano2");
+    if(!el) return 0;
 
-    setValue("percAssessoria2", cfg.percAssessoria.toFixed(2));
-    atualizarPercentuaisIndex2();
+    let perc = parseFloat(el.value);
+    if(isNaN(perc)) return 0;
+
+    return Math.max(0, Math.min(100, perc));
+  }
+
+  function normalizarPercRatioPlano2(){
+    const el = getEl("percRatioPlano2");
+    if(!el) return;
+
+    const raw = String(el.value).trim();
+    if(raw === "") return;
+
+    let perc = parseFloat(raw);
+    if(isNaN(perc)) perc = 0;
+
+    perc = Math.max(0, Math.min(100, perc));
+    el.value = String(perc)
+      .replace(/(\.\d*?[1-9])0+$/, "$1")
+      .replace(/\.0+$/, "");
+
     atualizarPainel();
   }
 
+  function syncRateioPlano2(){
+    const planoId = getValue("plano2", "0");
+    const cfg = PLANOS[planoId];
+
+    const ratioEl = getEl("ratioPlano2");
+    const percEl = getEl("percRatioPlano2");
+    const fieldRatio = getEl("fieldRatioPlano2");
+    const fieldPerc = getEl("fieldPercRatioPlano2");
+
+    const temPlano = !!cfg;
+
+    if(ratioEl) ratioEl.disabled = !temPlano;
+    if(fieldRatio) fieldRatio.classList.toggle("field-disabled", !temPlano);
+
+    const modo = getValue("ratioPlano2", "inteiro");
+    const usaPercentual = temPlano && modo === "percentual";
+
+    if(percEl) percEl.disabled = !usaPercentual;
+    if(fieldPerc) fieldPerc.classList.toggle("field-disabled", !usaPercentual);
+
+    if(!temPlano){
+      if(ratioEl) ratioEl.value = "inteiro";
+      if(percEl) percEl.value = "";
+    }
+  }
+
+  function getRotuloRateioPlano2(modo){
+    if(modo === "dividido") return "Dividido entre arrematações";
+    if(modo === "percentual") return "Percentual do fee";
+    if(modo === "quitado") return "Desconsiderado";
+    return "Padrão (100%)";
+  }
+
+  function calcularCustoPlano2(){
+    const planoId = getValue("plano2", "0");
+    const cfg = PLANOS[planoId];
+    if(!cfg) return 0;
+
+    const modo = getValue("ratioPlano2", "inteiro");
+
+    if(modo === "quitado") return 0;
+
+    if(modo === "dividido"){
+      return cfg.maxArrematacoes > 0
+        ? cfg.fee / cfg.maxArrematacoes
+        : cfg.fee;
+    }
+
+    if(modo === "percentual"){
+      const perc = getPercRatioPlano2Limitado() / 100;
+      return cfg.fee * perc;
+    }
+
+    return cfg.fee;
+  }
+
+  function aplicarPlano2(){
+  const planoId = getValue("plano2", "0");
+  const cfg = PLANOS[planoId];
+
+  if(!cfg){
+    setValue("percAssessoria2", "");
+    setValue("ratioPlano2", "inteiro");
+    setValue("percRatioPlano2", "");
+    syncRateioPlano2();
+    atualizarPercentuaisIndex2();
+    atualizarPainel();
+    return;
+  }
+
+  setValue("percAssessoria2", cfg.percAssessoria.toFixed(2));
+
+  if(!getValue("ratioPlano2")){
+    setValue("ratioPlano2", "inteiro");
+  }
+
+  syncRateioPlano2();
+  atualizarPercentuaisIndex2();
+  atualizarPainel();
+}
+  
   function atualizarPercentuaisIndex2(){
     const valorAquisicao = parseCurrency(getValue("valorAquisicao2"));
     const valorVenda = parseCurrency(getValue("valorVenda2"));
@@ -858,100 +965,106 @@
   }
 
   function montarCenarioIndex2(){
-    const tipo = normalizarTipoPagamento(getValue("tipoPagamento2"));
-    const valorAquisicao = parseCurrency(getValue("valorAquisicao2"));
-    const valorVenda = parseCurrency(getValue("valorVenda2"));
-    const plano = parseFloat(getValue("plano2") || 0) || 0;
-    const valorAssessoria = parseCurrency(getValue("valorAssessoria2"));
+  const tipo = normalizarTipoPagamento(getValue("tipoPagamento2"));
+  const valorAquisicao = parseCurrency(getValue("valorAquisicao2"));
+  const valorVenda = parseCurrency(getValue("valorVenda2"));
+  const plano = parseFloat(getValue("plano2") || 0) || 0;
+  const ratioPlano = getValue("ratioPlano2", "inteiro");
+  const percRatioPlano = getPercRatioPlano2Limitado();
+  const custoPlano = calcularCustoPlano2();
+  const valorAssessoria = parseCurrency(getValue("valorAssessoria2"));
 
-    const documentacao = parseCurrency(getValue("documentacao2"));
-    const leiloeiro = parseCurrency(getValue("leiloeiro2"));
-    const corretor = parseCurrency(getValue("corretor2"));
-    const dividas = parseCurrency(getValue("dividas2"));
-    const reforma = parseCurrency(getValue("reforma2"));
-    const honorarios = parseCurrency(getValue("honorarios2"));
-    const condMensal = parseCurrency(getValue("condMensal2"));
-    const iptuMensal = parseCurrency(getValue("iptuMensal2"));
+  const documentacao = parseCurrency(getValue("documentacao2"));
+  const leiloeiro = parseCurrency(getValue("leiloeiro2"));
+  const corretor = parseCurrency(getValue("corretor2"));
+  const dividas = parseCurrency(getValue("dividas2"));
+  const reforma = parseCurrency(getValue("reforma2"));
+  const honorarios = parseCurrency(getValue("honorarios2"));
+  const condMensal = parseCurrency(getValue("condMensal2"));
+  const iptuMensal = parseCurrency(getValue("iptuMensal2"));
 
-    const entradaPerc = getEntradaPerc2Limitado();
-    const entradaValor = Math.min(valorAquisicao, valorAquisicao * (entradaPerc / 100));
-    const jurosAnual = parseFloat(getValue("jurosAnual2") || 0) || 0;
-    const prazoFin = Math.max(0, parseInt(getValue("prazoFinanciamento2") || 0, 10));
-    const sistema = getValue("sistema2") || "SAC";
-    const prazoSaida = getPrazoSaidaIndex2();
+  const entradaPerc = getEntradaPerc2Limitado();
+  const entradaValor = Math.min(valorAquisicao, valorAquisicao * (entradaPerc / 100));
+  const jurosAnual = parseFloat(getValue("jurosAnual2") || 0) || 0;
+  const prazoFin = Math.max(0, parseInt(getValue("prazoFinanciamento2") || 0, 10));
+  const sistema = getValue("sistema2") || "SAC";
+  const prazoSaida = getPrazoSaidaIndex2();
 
-    const custosFixos = documentacao + leiloeiro + dividas + reforma + honorarios;
-    const custosTempo = (condMensal + iptuMensal) * prazoSaida;
+  const custosFixos = documentacao + leiloeiro + dividas + reforma + honorarios;
+  const custosTempo = (condMensal + iptuMensal) * prazoSaida;
 
-    let valorFinanciado = 0;
-    let parcela = 0;
-    let totalPagoAteSaida = 0;
-    let saldoDevedor = 0;
+  let valorFinanciado = 0;
+  let parcela = 0;
+  let totalPagoAteSaida = 0;
+  let saldoDevedor = 0;
 
-    if(tipo === "financiado" && valorAquisicao > 0 && prazoFin > 0){
-      valorFinanciado = Math.max(0, valorAquisicao - entradaValor);
+  if(tipo === "financiado" && valorAquisicao > 0 && prazoFin > 0){
+    valorFinanciado = Math.max(0, valorAquisicao - entradaValor);
 
-      const fin = calcFinDetalhado(
-        valorFinanciado,
-        jurosAnual,
-        prazoFin,
-        prazoSaida,
-        sistema
-      );
-
-      parcela = fin.parcela;
-      totalPagoAteSaida = fin.jurosAcum + fin.principalPago;
-      saldoDevedor = fin.saldoDevedor;
-    }
-
-    let desembolso = 0;
-
-    if(tipo === "avista"){
-      desembolso = valorAquisicao + custosFixos + custosTempo + plano + valorAssessoria;
-    } else {
-      desembolso = entradaValor + totalPagoAteSaida + custosFixos + custosTempo + plano + valorAssessoria;
-    }
-
-    let valorVendaLiquido = valorVenda - corretor;
-
-    if(tipo === "financiado"){
-      valorVendaLiquido -= saldoDevedor;
-    }
-
-    const lucroLiquido = valorVendaLiquido - desembolso;
-
-    return {
-      tipo,
-      valorAquisicao,
-      valorVenda,
-      plano,
-      valorAssessoria,
-      documentacao,
-      leiloeiro,
-      corretor,
-      dividas,
-      reforma,
-      honorarios,
-      condMensal,
-      iptuMensal,
-      entradaPerc,
-      entradaValor,
+    const fin = calcFinDetalhado(
+      valorFinanciado,
       jurosAnual,
       prazoFin,
-      sistema,
       prazoSaida,
-      custosFixos,
-      custosTempo,
-      valorFinanciado,
-      parcela,
-      totalPagoAteSaida,
-      saldoDevedor,
-      desembolso,
-      valorVendaLiquido,
-      lucroLiquido
-    };
+      sistema
+    );
+
+    parcela = fin.parcela;
+    totalPagoAteSaida = fin.jurosAcum + fin.principalPago;
+    saldoDevedor = fin.saldoDevedor;
   }
 
+  let desembolso = 0;
+
+  if(tipo === "avista"){
+    desembolso = valorAquisicao + custosFixos + custosTempo + custoPlano + valorAssessoria;
+  } else {
+    desembolso = entradaValor + totalPagoAteSaida + custosFixos + custosTempo + custoPlano + valorAssessoria;
+  }
+
+  let valorVendaLiquido = valorVenda - corretor;
+
+  if(tipo === "financiado"){
+    valorVendaLiquido -= saldoDevedor;
+  }
+
+  const lucroLiquido = valorVendaLiquido - desembolso;
+
+  return {
+    tipo,
+    valorAquisicao,
+    valorVenda,
+    plano,
+    ratioPlano,
+    percRatioPlano,
+    custoPlano,
+    valorAssessoria,
+    documentacao,
+    leiloeiro,
+    corretor,
+    dividas,
+    reforma,
+    honorarios,
+    condMensal,
+    iptuMensal,
+    entradaPerc,
+    entradaValor,
+    jurosAnual,
+    prazoFin,
+    sistema,
+    prazoSaida,
+    custosFixos,
+    custosTempo,
+    valorFinanciado,
+    parcela,
+    totalPagoAteSaida,
+    saldoDevedor,
+    desembolso,
+    valorVendaLiquido,
+    lucroLiquido
+  };
+}
+  
   function atualizarFinanciamentoIndex2(){
     const cenario = montarCenarioIndex2();
 
@@ -1100,6 +1213,16 @@
       const spreadBruto = cenario.valorVenda - cenario.valorAquisicao;
       insights.push(`Spread bruto entre compra e venda: ${fmtBRL(spreadBruto)}.`);
     }
+	
+	if(cenario.plano > 0){
+  let detalhePlano = getRotuloRateioPlano2(cenario.ratioPlano);
+
+  if(cenario.ratioPlano === "percentual"){
+    detalhePlano += ` (${cenario.percRatioPlano}%)`;
+  }
+
+  insights.push(`Custo do plano considerado nesta análise: ${fmtBRL(cenario.custoPlano)} — ${detalhePlano}.`);
+}
 
     if(cenario.tipo === "financiado"){
       insights.push(`Saldo devedor estimado na saída: ${fmtBRL(cenario.saldoDevedor)}.`);
@@ -1153,26 +1276,29 @@
       },
 
       operacao: {
-        valorAquisicao: getValue("valorAquisicao2"),
-        valorVenda: getValue("valorVenda2"),
-        tipoPagamento: getValue("tipoPagamento2") || "À vista",
-        estrategiaSaida: getValue("estrategiaSaida"),
-        prazoSaidaMeses: getValue("prazoSaidaMeses"),
-        plano: getValue("plano2") || 0,
-        percAssessoria: getValue("percAssessoria2") || 0,
-        valorAssessoria: getValue("valorAssessoria2"),
-        documentacaoPerc: getValue("documentacaoPerc2") || 0,
-        documentacao: getValue("documentacao2"),
-        leiloeiroPerc: getValue("leiloeiroPerc2") || 0,
-        leiloeiro: getValue("leiloeiro2"),
-        corretorPerc: getValue("corretorPerc2") || 0,
-        corretor: getValue("corretor2"),
-        dividas: getValue("dividas2"),
-        reforma: getValue("reforma2"),
-        honorarios: getValue("honorarios2"),
-        condMensal: getValue("condMensal2"),
-        iptuMensal: getValue("iptuMensal2")
-      },
+  valorAquisicao: getValue("valorAquisicao2"),
+  valorVenda: getValue("valorVenda2"),
+  tipoPagamento: getValue("tipoPagamento2") || "À vista",
+  estrategiaSaida: getValue("estrategiaSaida"),
+  prazoSaidaMeses: getValue("prazoSaidaMeses"),
+  plano: getValue("plano2") || 0,
+  ratioPlano: getValue("ratioPlano2") || "inteiro",
+  percRatioPlano: getValue("percRatioPlano2") || "",
+  custoPlano: fmtBRL(calcularCustoPlano2()),
+  percAssessoria: getValue("percAssessoria2") || 0,
+  valorAssessoria: getValue("valorAssessoria2"),
+  documentacaoPerc: getValue("documentacaoPerc2") || 0,
+  documentacao: getValue("documentacao2"),
+  leiloeiroPerc: getValue("leiloeiroPerc2") || 0,
+  leiloeiro: getValue("leiloeiro2"),
+  corretorPerc: getValue("corretorPerc2") || 0,
+  corretor: getValue("corretor2"),
+  dividas: getValue("dividas2"),
+  reforma: getValue("reforma2"),
+  honorarios: getValue("honorarios2"),
+  condMensal: getValue("condMensal2"),
+  iptuMensal: getValue("iptuMensal2")
+},
 
       financiamento: {
         entradaPerc: getValue("entradaPerc2") || 0,
@@ -1238,6 +1364,8 @@ const INDEX2_IMPORT_MAP = {
     estrategiaSaida: 'estrategiaSaida',
     prazoSaidaMeses: 'prazoSaidaMeses',
     plano: 'plano2',
+	ratioPlano: 'ratioPlano2',
+    percRatioPlano: 'percRatioPlano2',
     percAssessoria: 'percAssessoria2',
     valorAssessoria: 'valorAssessoria2',
     documentacaoPerc: 'documentacaoPerc2',
@@ -1299,9 +1427,10 @@ function aplicarPayloadNoFormulario(payload) {
   });
 
   if (!getValue('dataAnalise')) setValue('dataAnalise', hojeISO());
-  handleTipoPagamentoChangeIndex2();
-  aplicarPlano2();
-  atualizarPainel();
+handleTipoPagamentoChangeIndex2();
+aplicarPlano2();
+syncRateioPlano2();
+atualizarPainel();
 }
 
 function nomeArquivoSeguro(texto) {
@@ -1370,7 +1499,7 @@ function importarJsonIndex2(event) {
     'matriculaNumero','comarcaRegistro','linkMatricula','linkEdital',
     'tipoPrazoEdital','dataPrazoEdital','lanceMinimoEdital','valorAvaliacaoEdital',
     'valorAquisicao2','valorVenda2','tipoPagamento2','estrategiaSaida','prazoSaidaMeses',
-    'plano2','percAssessoria2','valorAssessoria2','documentacaoPerc2','documentacao2',
+    'plano2','ratioPlano2','percRatioPlano2','percAssessoria2','valorAssessoria2','documentacaoPerc2','documentacao2',
     'leiloeiroPerc2','leiloeiro2','corretorPerc2','corretor2','dividas2','reforma2',
     'honorarios2','condMensal2','iptuMensal2','entradaPerc2','entradaValor2',
     'jurosAnual2','prazoFinanciamento2','sistema2','valorFinanciado2',
@@ -1389,9 +1518,11 @@ function importarJsonIndex2(event) {
   });
 
   setValue('dataAnalise', hojeISO());
-  setValue('tipoPagamento2', 'avista');
-  setValue('sistema2', 'SAC');
-  setText('resumoSaldoDevedor2', fmtBRL(0));
+setValue('tipoPagamento2', 'avista');
+setValue('sistema2', 'SAC');
+setValue('ratioPlano2', 'inteiro');
+setValue('percRatioPlano2', '');
+setText('resumoSaldoDevedor2', fmtBRL(0));
 
   const sessao = obterSessaoItaoca();
   if (sessao?.nome) setValue('analistaResponsavel', sessao.nome);
@@ -1443,6 +1574,8 @@ function preencherIndex2ComPayload(payload) {
   setValue('estrategiaSaida', operacao.estrategiaSaida || '');
   setValue('prazoSaidaMeses', operacao.prazoSaidaMeses || '');
   setValue('plano2', operacao.plano || '0');
+  setValue('ratioPlano2', operacao.ratioPlano || 'inteiro');
+  setValue('percRatioPlano2', operacao.percRatioPlano || '');
   setValue('percAssessoria2', operacao.percAssessoria || '');
   setValue('valorAssessoria2', operacao.valorAssessoria || '');
   setValue('documentacaoPerc2', operacao.documentacaoPerc || '');
@@ -1512,7 +1645,7 @@ function preencherIndex2ComPayload(payload) {
 
   [
     'dataAnalise','analistaResponsavel',
-    'valorAquisicao2','valorVenda2','estrategiaSaida','prazoSaidaMeses','percAssessoria2',
+    'valorAquisicao2','valorVenda2','estrategiaSaida','prazoSaidaMeses','ratioPlano2','percRatioPlano2','percAssessoria2',
     'documentacaoPerc2','leiloeiroPerc2','corretorPerc2','dividas2','reforma2',
     'honorarios2','condMensal2','iptuMensal2','entradaPerc2','jurosAnual2',
     'prazoFinanciamento2','sistema2','ocupado','quemOcupa','matriculaLimpa',
@@ -1535,10 +1668,23 @@ function preencherIndex2ComPayload(payload) {
     tipoPagamentoEl.addEventListener('change', handleTipoPagamentoChangeIndex2);
   }
 
+const ratioPlanoEl = getEl('ratioPlano2');
+if (ratioPlanoEl) {
+  ratioPlanoEl.addEventListener('change', function () {
+    syncRateioPlano2();
+    atualizarPainel();
+  });
+}
+
+const percRatioPlanoEl = getEl('percRatioPlano2');
+if (percRatioPlanoEl) {
+  percRatioPlanoEl.addEventListener('blur', normalizarPercRatioPlano2);
+}
+
   const planoEl = getEl('plano2');
-  if (planoEl) {
-    planoEl.addEventListener('change', aplicarPlano2);
-  }
+if (planoEl) {
+  planoEl.addEventListener('change', aplicarPlano2);
+}
 
   const entradaPercEl = getEl('entradaPerc2');
   if (entradaPercEl) {
@@ -1584,8 +1730,9 @@ function preencherIndex2ComPayload(payload) {
     atualizarPainel();
   } else {
     handleTipoPagamentoChangeIndex2();
-    aplicarPlano2();
-    atualizarPainel();
+aplicarPlano2();
+syncRateioPlano2();
+atualizarPainel();
   }
 });
 
